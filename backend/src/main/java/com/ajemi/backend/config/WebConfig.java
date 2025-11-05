@@ -14,7 +14,10 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")          // جميع endpoints
-                        .allowedOrigins("http://localhost:4200");  // فقط Angular
+                        .allowedOrigins("http://localhost:4200")  // فقط Angular
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }

@@ -1,25 +1,77 @@
 package com.ajemi.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
+import lombok.Data;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
+@Data
+public class User {
 
-public class User{
-     @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // obligatoire
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @Column(nullable = false)
-    private String username; 
-
-    @Column(nullable = false)
-    private String email; 
-
     private String password;
+
+    private String bio;
+    private String profilePicture;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    // 🔐 Relation avec les rôles
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
+    // 📝 Relation avec les posts
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Post> posts = new ArrayList<>();
+
+    // 💬 Relation avec les commentaires
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+
+    // ❤️ Relation avec les likes
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Like> likes = new ArrayList<>();
+
+    // 👥 Relation avec les abonnements
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL)
+    private List<Subscription> following = new ArrayList<>();
+
+    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL)
+    private List<Subscription> followers = new ArrayList<>();
+
+    // 🔔 Notifications
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Notification> notifications = new ArrayList<>();
+
+    // 🚨 Signalements
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL)
+    private List<Report> reportsSent = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL)
+    private List<Report> reportsReceived = new ArrayList<>();
+
+    // 🧱 Constructeurs, getters, setters
+    public User() {}
+
+    // getters et setters ici
 }
