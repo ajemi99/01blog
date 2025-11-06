@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth.service';
 import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -51,23 +52,24 @@ export class LoginComponent {
   usernameOrEmail = '';
   password = '';
   message = signal('');
-  // loading = false;
+
   isError = false;
 
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService ,private router: Router) {}
 
   async doLogin() {
     try {
-      // this.loading = true;
+
       this.isError = false;
       await this.auth.login(this.usernameOrEmail, this.password);
-      this.message.set('Connecté');
+
+      this.router.navigateByUrl('/home');
     } catch (e: any) {
       this.isError = true;
       const msg = e?.error?.message || e?.message || e?.statusText || 'Erreur login';
       this.message.set(msg);
     }
-    // this.loading = false;
+
   }
 }
 

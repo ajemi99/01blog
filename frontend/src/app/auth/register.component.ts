@@ -70,7 +70,6 @@ export class RegisterComponent {
     } catch (e: any) {
       this.isError = true;
       const msg = e?.error?.message || e?.message || e?.statusText || 'Erreur inscription';
-      console.log("11111"+msg);
       
       this.message.set(msg);
     }
