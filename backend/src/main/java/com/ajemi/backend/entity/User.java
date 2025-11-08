@@ -1,12 +1,9 @@
 package com.ajemi.backend.entity;
 
-
 import jakarta.persistence.*;
-
+import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.*;
-
-import lombok.Data;
 
 @Entity
 @Table(name = "users")
@@ -28,17 +25,12 @@ public class User {
 
     private String bio;
     private String profilePicture;
-
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // 🔐 Relation avec les rôles
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    // 🧩 علاقة ManyToOne: كل User عندو Role واحد
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id") // هاد العمود غادي يتزاد فـ جدول users
+    private Role role;
 
     // 📝 Relation avec les posts
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

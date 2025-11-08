@@ -1,21 +1,23 @@
 package com.ajemi.backend.entity;
 
 import jakarta.persistence.*;
-// import java.util.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "roles")
+@Data
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String name; // ex: "ROLE_USER" ou "ROLE_ADMIN"
+    @Enumerated(EnumType.STRING) // باش نخزن الاسم كـ "ADMIN" أو "USER"
+    @Column(nullable = false, unique = true)
+    private RoleName name;
 
-    public Role() {}
-    public Role(String name) { this.name = name; }
-
-    // getters et setters
+    public enum RoleName {
+        USER,
+        ADMIN
+    }
 }

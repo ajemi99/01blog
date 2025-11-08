@@ -8,8 +8,11 @@ export class AuthInterceptor implements HttpInterceptor {
     const token = localStorage.getItem('token');
     if (token) {
       const cloned = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+     console.log('Interceptor: token added ✅', cloned);
       return next.handle(cloned);
+      
     }
+     console.log('Interceptor: no token ❌', req);
     return next.handle(req);
   }
 }

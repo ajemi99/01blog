@@ -7,17 +7,21 @@ import com.ajemi.backend.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ajemi.backend.entity.Role;
 import com.ajemi.backend.exception.ApiException;
+import com.ajemi.backend.repository.RoleRepository;
 
 @Service
 public class AuthService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(UserRepository userRepository,RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
         this.jwtService = jwtService;
     }
 
@@ -32,6 +36,9 @@ public class AuthService {
         u.setUsername(username);
         u.setEmail(email);
         u.setPassword(passwordEncoder.encode(rawPassword));
+        Role userRole = roleRepository.findByName(Role.RoleName.USER)
+            .orElseThrow(() -> new RuntimeException("Role USER non trouvé"));
+        u.setRole(userRole);
         userRepository.save(u);
         return jwtService.generateToken(username);
     }

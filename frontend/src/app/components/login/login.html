@@ -1,0 +1,19 @@
+<div class="auth-wrapper">
+      <div class="card">
+        <h2>Connexion</h2>
+        <form (ngSubmit)="doLogin()">
+          <label>Username ou Email</label>
+          <input class="input" placeholder="ex: demo ou demo@mail.com" [(ngModel)]="usernameOrEmail" name="usernameOrEmail" required />
+
+          <label>Mot de passe</label>
+          <input class="input" placeholder="Votre mot de passe" type="password" [(ngModel)]="password" name="password" required />
+
+          <button type="submit" class="btn primary" >Se connecter</button>
+        </form>
+
+        <p class="muted">Pas de compte ?
+          <a routerLink="/register" class="link">Créer un compte</a>
+        </p>
+        <p class="status" [class.error]="isError">{{ message() }}</p>
+      </div>
+    </div>
