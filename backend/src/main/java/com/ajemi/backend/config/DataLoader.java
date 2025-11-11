@@ -1,10 +1,13 @@
 package com.ajemi.backend.config;
 
+import java.util.Set;
+
 import com.ajemi.backend.entity.Role;
 import com.ajemi.backend.entity.Role.RoleName;
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.RoleRepository;
 import com.ajemi.backend.repository.UserRepository;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

@@ -1,5 +1,6 @@
 package com.ajemi.backend.service;
 
+
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.UserRepository;
 import com.ajemi.backend.security.JwtService;
@@ -11,6 +12,7 @@ import com.ajemi.backend.entity.Role;
 import com.ajemi.backend.exception.ApiException;
 import com.ajemi.backend.repository.RoleRepository;
 
+
 @Service
 public class AuthService {
     private final UserRepository userRepository;
@@ -18,13 +20,15 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository,RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(UserRepository userRepository, RoleRepository roleRepository, 
+                       PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
         this.jwtService = jwtService;
     }
 
+    // 🔹 Register avec token incluant role
     public String register(String username, String email, String rawPassword) {
         if (rawPassword == null || rawPassword.trim().isEmpty()) {
             throw new ApiException("Password cannot be empty");
@@ -32,25 +36,33 @@ public class AuthService {
         if (userRepository.existsByEmail(email) || userRepository.existsByUsername(username)) {
             throw new ApiException("User already exists");
         }
-        User u = new User();
-        u.setUsername(username);
-        u.setEmail(email);
-        u.setPassword(passwordEncoder.encode(rawPassword));
+
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(rawPassword));
+
         Role userRole = roleRepository.findByName(Role.RoleName.USER)
-            .orElseThrow(() -> new RuntimeException("Role USER non trouvé"));
-        u.setRole(userRole);
-        userRepository.save(u);
-        return jwtService.generateToken(username);
+                .orElseThrow(() -> new RuntimeException("Role USER non trouvé"));
+        user.setRole(userRole); // set role USER par défaut
+
+        userRepository.save(user);
+
+        // token avec role
+        return jwtService.generateTokenWithRoles(username, user.getRole());
     }
 
+    // 🔹 Login
     public String login(String usernameOrEmail, String rawPassword) {
-        User u = userRepository.findByUsername(usernameOrEmail)
+        User user = userRepository.findByUsername(usernameOrEmail)
                 .or(() -> userRepository.findByEmail(usernameOrEmail))
                 .orElseThrow(() -> new ApiException("User not found"));
-        if (!passwordEncoder.matches(rawPassword, u.getPassword())) {
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new ApiException("Invalid credentials");
         }
-        return jwtService.generateToken(u.getUsername());
+
+        return jwtService.generateTokenWithRoles(user.getUsername(), user.getRole());
     }
 }
 

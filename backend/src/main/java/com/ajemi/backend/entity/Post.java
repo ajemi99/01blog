@@ -1,11 +1,14 @@
 package com.ajemi.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
 @Table(name = "posts")
+@Data
 public class Post {
 
     @Id

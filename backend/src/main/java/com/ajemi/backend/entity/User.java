@@ -30,7 +30,7 @@ public class User {
     // 🧩 علاقة ManyToOne: كل User عندو Role واحد
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id") // هاد العمود غادي يتزاد فـ جدول users
-    private Role role;
+    private Role role ;
 
     // 📝 Relation avec les posts
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

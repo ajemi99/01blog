@@ -4,6 +4,8 @@ import com.ajemi.backend.dto.AuthResponseDTO;
 import com.ajemi.backend.dto.LoginRequestDTO;
 import com.ajemi.backend.dto.RegisterRequestDTO;
 import com.ajemi.backend.service.AuthService;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +33,13 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<?> me(Authentication authentication) {
-        return ResponseEntity.ok(Map.of("username", authentication.getName()));
+   @GetMapping("/me")
+public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+    if (authentication == null || !authentication.isAuthenticated()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+    return ResponseEntity.ok(Map.of(
+        "username", authentication.getName()
+    ));
+}
 }

@@ -1,0 +1,19 @@
+<div class="page-background">
+  <div class="post-card">
+    <h2>📝 Créer un nouveau post</h2>
+
+    <form (ngSubmit)="createPost()">
+      <div class="form-group">
+        <label>Titre :</label>
+        <input type="text" [(ngModel)]="title" name="title" required placeholder="Titre de votre post">
+      </div>
+
+      <div class="form-group">
+        <label>Contenu :</label>
+        <textarea [(ngModel)]="content" name="content" required placeholder="Écrivez votre contenu ici..."></textarea>
+      </div>
+
+      <button type="submit">Publier</button>
+    </form>
+</div>
+</div>

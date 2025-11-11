@@ -30,4 +30,20 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
   }
+  async checkToken(): Promise<void> {
+    const token = this.token;
+    if (!token) {
+      this.logout();
+      return;
+    }
+
+    try {
+      // On envoie la requête vers le backend pour vérifier la validité du token
+      await firstValueFrom(this.http.get(`${this.baseUrl}/me`));
+    } catch (err) {
+      console.error('Token invalide ou expiré ❌', err);
+      this.logout(); // redirection vers login
+      window.location.href = '/login';
+    }
+  }
 }

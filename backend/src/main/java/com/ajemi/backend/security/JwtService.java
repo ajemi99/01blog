@@ -5,13 +5,17 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+
+import com.ajemi.backend.entity.Role;
 
 @Service
 public class JwtService {
@@ -34,7 +38,10 @@ public class JwtService {
     public String generateToken(String username) {
         return generateToken(Map.of(), username);
     }
-
+    public String generateTokenWithRoles(String username, Role role) {
+        Map<String, Object> claims = Map.of("role", role.getName().toString());
+        return generateToken(claims, username);
+    }
     public String generateToken(Map<String, Object> extraClaims, String username) {
         return Jwts.builder()
                 .setClaims(extraClaims)

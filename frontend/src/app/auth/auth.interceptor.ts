@@ -12,7 +12,7 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(cloned);
       
     }
-     console.log('Interceptor: no token ❌', req);
+    
     return next.handle(req);
   }
 }
