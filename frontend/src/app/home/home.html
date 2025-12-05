@@ -5,16 +5,16 @@
   </nav>
 
   <div class="actions">
-    <button (click)="showCreatePost.set(true)">📝 Créer un post</button>
+    <!-- <button (click)="showCreatePost.set(true)">📝 Créer un post</button> -->
   </div>
 
 
 </div>
 
 <!-- Modal -->
-<div class="modal-backdrop" *ngIf="showCreatePost()">
-  <div class="modal">
-    <h2>📝 Créer un nouveau post</h2>
+<!-- <div class="modal-backdrop" *ngIf="showCreatePost()"> -->
+  <!-- <div class="modal">
+    <h2> Créer un nouveau post</h2>
     <form (ngSubmit)="createPost()">
       <div class="form-group">
         <label>Titre :</label>
@@ -34,5 +34,12 @@
         <button type="button" (click)="showCreatePost.set(false)">❌ Fermer</button>
       </div>
     </form>
-  </div>
-</div>
+  </div> -->
+<button (click)="openCreatePost()">Create Post</button>
+
+<!-- Popup -->
+<div class="popup" *ngIf="showPopup">
+  <app-create-post></app-create-post>
+  <button (click)="closePopup()">Close</button>
+</div><!-- 
+</div> -->

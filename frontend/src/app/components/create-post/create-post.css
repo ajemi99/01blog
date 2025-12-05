@@ -1,82 +1,18 @@
-/* Background général */
-.page-background {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Carte du formulaire */
-.post-card {
-  background-color: #ffffff;
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  width: 100%;
-  max-width: 600px;
-}
-
-/* Titre */
-.post-card h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 30px;
-}
-
-/* Form groups */
-.form-group {
-  margin-bottom: 20px;
-}
-
-/* Labels */
-.form-group label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #555;
-}
-
-/* Inputs et textarea */
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 14px;
+.create-post-form {
+  background: white;
+  padding: 20px;
   border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 16px;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  max-width: 400px;
+  margin: auto;
+  border-radius: 8px;
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
-  outline: none;
-}
-
-/* Placeholder */
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #aaa;
-}
-
-/* Bouton */
-button {
+textarea {
   width: 100%;
-  padding: 16px;
-  background-color: #007bff;
-  color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s, transform 0.2s;
+  height: 80px;
+  margin-bottom: 10px;
 }
 
-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
+.buttons {
+  text-align: right;
 }

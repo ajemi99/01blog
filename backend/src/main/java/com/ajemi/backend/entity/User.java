@@ -5,9 +5,12 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "users")
 @Data
+@JsonIgnoreProperties({"posts", "comments", "likes", "following", "followers", "notifications", "reportsSent", "reportsReceived"})
 public class User {
 
     @Id
@@ -33,7 +36,8 @@ public class User {
     private Role role ;
 
     // 📝 Relation avec les posts
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+   
     private List<Post> posts = new ArrayList<>();
 
     // 💬 Relation avec les commentaires

@@ -4,11 +4,13 @@ import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { CreatePostComponent } from '../components/create-post/create-post';
+
 
 @Component({
   selector: 'app-home',
   standalone: true,
-    imports: [FormsModule, CommonModule],
+    imports: [FormsModule, CommonModule,CreatePostComponent],
  templateUrl: './home.html',
 
  styleUrl: './home.css',
@@ -19,7 +21,15 @@ export class Home {
   username = signal('');
   roles = signal<string[]>([]);
   showCreatePost = signal(false);
+showPopup: boolean = false;
 
+  openCreatePost() {
+    this.showPopup = true;
+  }
+
+  closePopup() {
+    this.showPopup = false;
+  }
   constructor(private auth: AuthService, private router: Router,private http: HttpClient) {
     auth.checkToken();
 
@@ -43,9 +53,9 @@ export class Home {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
-  goToCreatePost() {
-    this.router.navigate(['/create-post']);
-  } 
+  // goToCreatePost() {
+  //   this.router.navigate(['/create-post']);
+  // } 
   selectedFile: File | null = null;
 
 onFileSelected(event: any) {
@@ -54,22 +64,24 @@ onFileSelected(event: any) {
     this.selectedFile = file;
   }
 }
+// openCreatePost() {
+//   // hadi ghadi t7al popup / wla dir chi action
+//   console.log("Open create post!");
+// }
  createPost() {
-  if (!this.title || !this.content) return;
+  if (!this.content) return;
 
-  const formData = new FormData();
-  formData.append('title', this.title);
-  formData.append('content', this.content);
-  if (this.selectedFile) {
-    formData.append('file', this.selectedFile);
+  const body = {
+
+    content:this.content
   }
 
-  this.http.post('http://localhost:8080/api/posts', formData).subscribe({
-    next: () => {
+
+  this.http.post('http://localhost:8080/api/posts', body).subscribe({
+    next: (res) => {
       alert('✅ Post créé avec succès !');
       this.title = '';
       this.content = '';
-      this.selectedFile = null;
       this.showCreatePost.set(false);
     },
     error: (err) => {
