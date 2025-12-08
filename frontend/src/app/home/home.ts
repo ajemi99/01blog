@@ -5,12 +5,13 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CreatePostComponent } from '../components/create-post/create-post';
+import { PostListComponent } from '../components/post-list/post-list';
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-    imports: [FormsModule, CommonModule,CreatePostComponent],
+    imports: [FormsModule, CommonModule,CreatePostComponent,PostListComponent],
  templateUrl: './home.html',
 
  styleUrl: './home.css',

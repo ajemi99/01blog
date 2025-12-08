@@ -33,6 +33,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { PostService } from '../../services/post.service';
 
 @Component({
   selector: 'app-create-post',
@@ -45,23 +46,29 @@ export class CreatePostComponent {
   description: string = '';
   file!: File | null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private postService: PostService) {}
 
   onFileSelected(event: any) {
     this.file = event.target.files[0];
   }
 
   submitPost() {
-    const formData = new FormData();
-    formData.append('description', this.description);
-    if (this.file) formData.append('file', this.file);
+    // const formData = new FormData();
+    // formData.append('description', this.description);
+    // if (this.file) formData.append('file', this.file);
+    
+  if (!this.description.trim() && !this.file) {
+    alert("مايمكنش تسيفط بوست خاوي، خاص description ولا صورة !");
+    return;
+  }
 
-    this.http.post('http://localhost:8080/api/posts', formData, { withCredentials: true }).subscribe({
-      next: res => {
-        console.log('Post created', res);
+    this.postService.createPost(this.description,this.file?? undefined).subscribe({
+      next: (res) => {
         alert('Post created successfully!');
+        this.description = '';
+        this.file = null;
       },
-      error: err => {
+      error: (err) => {
         console.error(err);
         alert('Error creating post');
       }

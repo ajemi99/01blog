@@ -22,11 +22,16 @@ public class PostController {
     // Create a new post
     // ===============================
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<PostResponseDTO> createPost(
+    public ResponseEntity<?> createPost(
             Authentication auth,
             @RequestPart(required = false) String description,
             @RequestPart(required = false) MultipartFile file
     ) {
+         if ((description == null || description.trim().isEmpty()) && 
+        (file == null || file.isEmpty())) {
+
+        return ResponseEntity.badRequest().body("Post cannot be empty!");
+    }
         // 1️⃣ Get username from JWT token
         String username = auth.getName();
 

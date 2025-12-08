@@ -1,0 +1,11 @@
+<div *ngFor="let post of posts" class="post-card">
+  <p>{{ post.description }}</p>
+  <p>By: {{ post.authorUsername }}</p>
+
+  <img *ngIf="isImage(post.mediaUrl)" [src]="'http://localhost:8080' + post.mediaUrl" alt="post image" />
+
+  <video *ngIf="isVideo(post.mediaUrl)" width="400" controls>
+    <source [src]="'http://localhost:8080' + post.mediaUrl" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>

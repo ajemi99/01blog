@@ -1,0 +1,7 @@
+img {
+  width: 200px;        /* العرض */
+  height: auto;        /* الطول كيستاجب */
+  object-fit: cover;   /* باش تبان مزيانة */
+  border-radius: 10px; /* زوايا مدوّرة (اختياري) */
+  margin-top: 10px;    /* مسافة صغيرة */
+}

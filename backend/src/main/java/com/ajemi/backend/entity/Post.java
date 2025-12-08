@@ -1,6 +1,7 @@
 package com.ajemi.backend.entity;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 // import lombok.Data;
@@ -32,7 +33,7 @@ public class Post {
     private String mediaUrl;
 
     private Instant createdAt = Instant.now();
-
+    private LocalDateTime updatedAt;
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;
