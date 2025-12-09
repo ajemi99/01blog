@@ -1,163 +1,120 @@
-/* Navbar */
+.container {
+max-width: 900px;
+margin: 0 auto;
+padding: 20px;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background-color: #f9f9f9;
+}
+
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #1e1e2f;
-  color: white;
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+display: flex;
+justify-content: space-between;
+align-items: center;
+background-color: #fff;
+padding: 10px 20px;
+border-radius: 8px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .navbar h1 {
-  margin: 0;
-  font-size: 1.5rem;
+font-size: 24px;
+margin: 0;
 }
 
-.navbar button {
-  background-color: #ff6b6b;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
+.navbar button  {
+padding: 6px 12px;
+border: none;
+border-radius: 5px;
+background-color: black;
+color: #fff;
+cursor: pointer;
 }
 
 .navbar button:hover {
-  background-color: #e03e3e;
+background-color: #d81828;
 }
 
-/* Actions sous navbar */
-.actions {
-  margin: 1rem 0;
-  text-align: right; /* bouton aligné à droite */
-}
-
-.actions button {
-  background-color: #1dd1a1;
-  color: white;
+/* Bouton Create Post */
+.create-post-btn {
+  padding: 10px 20px;
+  background-color: black; /* vert vif */
+  color: #fff;
   border: none;
-  padding: 0.6rem 1.2rem;
   border-radius: 8px;
-  font-weight: bold;
   cursor: pointer;
-  transition: 0.2s;
+  font-weight: bold;
+  margin: 20px 0;
+  float: right; /* pour le mettre à droite */
+  transition: background 0.2s, transform 0.2s;
 }
 
-.actions button:hover {
-  background-color: #10ac84;
+.create-post-btn:hover {
+  background-color: #218838; /* vert plus foncé au hover */
+  transform: translateY(-2px);
+}
+
+
+.post-card {
+background-color: #fff;
+padding: 15px;
+margin: 15px 0;
+border-radius: 10px;
+box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.post-card p {
+margin: 5px 0;
+}
+
+.post-card img,
+.post-card video {
+max-width: 100%;
+border-radius: 8px;
+margin-top: 10px;
 }
 
 .popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.95);
-  padding: 20px;
-  border: 1px solid #ccc;
-  z-index: 1000;
-  border-radius: 8px;
-}
-
-
-/* Modal */
-.modal-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.6);
+  background-color: rgba(0,0,0,0.4);
   display: flex;
-  justify-content: center; /* centré horizontalement */
+  justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
-.modal {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  animation: popup 0.3s ease-out;
+.popup app-create-post {
+  position: relative; /* Important pour le bouton */
+  background-color: #fff;
+  padding: 30px 20px 20px 20px; /* padding top pour le bouton */
+  border-radius: 10px;
+  min-width: 300px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-.modal h2 {
-  text-align: center;
-  margin-top: 0;
-  color: #222;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.modal input,
-.modal textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  margin-top: 0.3rem;
-  font-size: 1rem;
-}
-
-.modal textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
-}
-
-.modal-buttons button {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+/* Bouton Close */
+.popup app-create-post .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ff5b5b;
+  color: #fff;
   border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 28px;
+  text-align: center;
   cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
+  transition: background 0.2s;
 }
 
-.modal-buttons button[type="submit"] {
-  background-color: #007bff;
-  color: white;
-}
-
-.modal-buttons button[type="submit"]:hover {
-  background-color: #0056b3;
-}
-
-.modal-buttons button[type="button"] {
-  background-color: #ff6b6b;
-  color: white;
-}
-
-.modal-buttons button[type="button"]:hover {
-  background-color: #e03e3e;
-}
-
-/* Animation */
-@keyframes popup {
-  from { transform: translateY(-20px) scale(0.9); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .actions {
-    text-align: center;
-  }
+.popup app-create-post .close-btn:hover {
+  background-color: #ff1e1e;
 }

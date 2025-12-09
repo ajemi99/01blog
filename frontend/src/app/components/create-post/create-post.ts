@@ -30,7 +30,7 @@
 //     });
 //   }
 // }
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { PostService } from '../../services/post.service';
@@ -43,6 +43,7 @@ import { PostService } from '../../services/post.service';
   imports: [FormsModule, HttpClientModule]
 })
 export class CreatePostComponent {
+  @Output() postCreated = new EventEmitter<void>();
   description: string = '';
   file!: File | null;
 
@@ -64,13 +65,15 @@ export class CreatePostComponent {
 
     this.postService.createPost(this.description,this.file?? undefined).subscribe({
       next: (res) => {
-        alert('Post created successfully!');
+        
+        // alert('Post created successfully!');
         this.description = '';
         this.file = null;
+        this.postCreated.emit();
       },
       error: (err) => {
         console.error(err);
-        alert('Error creating post');
+        // alert('Error creating post');
       }
     });
   }

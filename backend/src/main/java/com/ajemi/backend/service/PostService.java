@@ -1,11 +1,15 @@
 package com.ajemi.backend.service;
 
+import java.io.File;
+
 import com.ajemi.backend.dto.PostResponseDTO;
 import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.PostRepository;
 import com.ajemi.backend.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -68,6 +72,24 @@ public class PostService {
         // dto.setLikes(post.getLikes());
         return dto;
     }
+    public void deletePost(Long id) {
+
+    Post post = postRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Post not found"));
+
+    // احذف الملف إذا كان موجود
+    if (post.getMediaUrl() != null) {
+        String filePath = "uploads" + post.getMediaUrl(); // mediaUrl = "/uploads/xxxx.jpg"
+        File file = new File("." + post.getMediaUrl());   // ملف داخل project
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    // حذف البوست من قاعدة البيانات
+    postRepository.deleteById(id);
+}
+
 }
 
 

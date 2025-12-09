@@ -3,47 +3,20 @@
     <h1>📝 Mon Blog</h1>
     <button (click)="logout()">Déconnexion</button>
   </nav>
-
-  <div class="actions">
-    <!-- <button (click)="showCreatePost.set(true)">📝 Créer un post</button> -->
-  </div>
-
-
+<button class="create-post-btn" (click)="openCreatePost()">Create Post</button>
+  
 </div>
 
-<!-- Modal -->
-<!-- <div class="modal-backdrop" *ngIf="showCreatePost()"> -->
-  <!-- <div class="modal">
-    <h2> Créer un nouveau post</h2>
-    <form (ngSubmit)="createPost()">
-      <div class="form-group">
-        <label>Titre :</label>
-        <input type="text" [(ngModel)]="title" name="title" required placeholder="Titre du post">
-      </div>
 
-      <div class="form-group">
-        <label>Contenu :</label>
-        <textarea [(ngModel)]="content" name="content" required placeholder="Écrivez ici..."></textarea>
-      </div>
-      <div class="form-group">
-        <label>upload video or image</label>
-        <input type="file" (change)="onFileSelected($event)" accept="image/*,video/*"multiple>
-      </div>
-      <div class="modal-buttons">
-        <button type="submit">Publier</button>
-        <button type="button" (click)="showCreatePost.set(false)">❌ Fermer</button>
-      </div>
-    </form>
-  </div> -->
-<button (click)="openCreatePost()">Create Post</button>
 
 <!-- Popup -->
 <div class="popup" *ngIf="showPopup">
-  <app-create-post></app-create-post>
+  <app-create-post (postCreated)="closePopup()">
 
-  <button (click)="closePopup()">Close</button>
+    <button class="close-btn" (click)="closePopup()">×</button>
+  </app-create-post>
+
 </div>
 <app-post-list></app-post-list>
 
-<!-- 
-</div> -->
+

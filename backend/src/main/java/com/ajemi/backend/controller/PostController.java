@@ -50,6 +50,15 @@ public class PostController {
         List<PostResponseDTO> posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePost(@PathVariable Long id) {
+        try {
+            postService.deletePost(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error deleting post: " + e.getMessage());
+        }
+    }
 }
 
 

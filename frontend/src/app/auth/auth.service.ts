@@ -6,6 +6,8 @@ import { firstValueFrom } from 'rxjs';
 export class AuthService {
   private readonly baseUrl = 'http://localhost:8080/api/auth';
   private readonly tokenKey = 'token';
+  currentUser: any = null;
+
 
   constructor(private http: HttpClient) {}
 
@@ -39,7 +41,9 @@ export class AuthService {
 
     try {
       // On envoie la requête vers le backend pour vérifier la validité du token
-      await firstValueFrom(this.http.get(`${this.baseUrl}/me`));
+      const user = await firstValueFrom(this.http.get(`${this.baseUrl}/me`));
+          this.currentUser = user;  // ← خزن username هنا
+          console.log("Current User:", this.currentUser);
     } catch (err) {
       console.error('Token invalide ou expiré ❌', err);
       this.logout(); // redirection vers login

@@ -1,11 +1,32 @@
-<div *ngFor="let post of posts" class="post-card">
+<div *ngFor="let post of posts" class="post-card" style="position: relative;">
+
+  <!-- زر 3 نقاط -->
+  <button class="post-menu-btn" (click)="toggleMenu(post)">⋮</button>
+
+  <!-- Menu -->
+  <div class="post-menu" *ngIf="post.showMenu">
+
+    <!-- إذا كان صاحب البوست -->
+    <ng-container *ngIf="auth.currentUser?.username === post.authorUsername; else reportButton">
+      <div (click)="editPost(post)">✏️ Edit</div>
+      <div (click)="deletePost(post.id)">🗑 Delete</div>
+    </ng-container>
+
+    <!-- إذا ماشي هو صاحب البوست -->
+    <ng-template #reportButton>
+       <!-- (click)="reportPost(post.id)" -->
+      <div>🚩 Report</div>
+    </ng-template>
+
+  </div>
+
+  <h3>By: {{ post.authorUsername }} | {{ post.createdAt | date:'short' }}</h3>
   <p>{{ post.description }}</p>
-  <p>By: {{ post.authorUsername }}</p>
 
   <img *ngIf="isImage(post.mediaUrl)" [src]="'http://localhost:8080' + post.mediaUrl" alt="post image" />
 
-  <video *ngIf="isVideo(post.mediaUrl)" width="400" controls>
-    <source [src]="'http://localhost:8080' + post.mediaUrl" type="video/mp4" />
-    Your browser does not support the video tag.
+  <video *ngIf="isVideo(post.mediaUrl)" controls>
+    <source [src]="'http://localhost:8080' + post.mediaUrl" />
   </video>
+
 </div>
