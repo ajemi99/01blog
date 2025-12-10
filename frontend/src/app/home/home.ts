@@ -22,10 +22,17 @@ export class Home {
   username = signal('');
   roles = signal<string[]>([]);
   showCreatePost = signal(false);
-showPopup: boolean = false;
+  showPopup: boolean = false;
 
   openCreatePost() {
     this.showPopup = true;
+  }
+
+  newPost: any = null;
+
+  onPostCreated(post: any) {
+    this.newPost = post;   // كنصايفط البوست الجداد ل PostList
+    this.closePopup();     // نسد popup
   }
 
   closePopup() {

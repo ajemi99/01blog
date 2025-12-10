@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Input  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostService, Post } from '../../services/post.service';
 import { AuthService } from '../../auth/auth.service';
+
 
 @Component({
   selector: 'app-post-list',
@@ -12,7 +13,13 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class PostListComponent {
   posts: Post[] = [];
+   @Input() newPost: any;
 
+   ngOnChanges() {
+    if (this.newPost) {
+      this.posts.unshift(this.newPost); // ← البوست الجديد اللول
+    }
+  }
   constructor(private postService: PostService,public auth: AuthService) {
     this.loadPosts();
 
@@ -56,6 +63,10 @@ deletePost(id: number) {
     },
     error: (err) => console.error(err)
   });
+}
+addPostOnTop() {
+  // غير سد popup ولا رجّع posts
+  this.loadPosts(); // أو أي حاجة كتديرها
 }
 
 }

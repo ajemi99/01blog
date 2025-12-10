@@ -46,7 +46,7 @@
   <h2>Create Post</h2>
 
   <textarea [(ngModel)]="description" placeholder="Description..."></textarea>
-  <input type="file" (change)="onFileSelected($event)" accept="video/*" />
+  <input type="file" (change)="onFileSelected($event)" accept="image/*,video/*" />
 
   <div class="buttons">
     <button (click)="submitPost()">Publish</button>

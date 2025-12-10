@@ -11,12 +11,12 @@
 
 <!-- Popup -->
 <div class="popup" *ngIf="showPopup">
-  <app-create-post (postCreated)="closePopup()">
+  <app-create-post (postCreated)="onPostCreated($event)">
 
     <button class="close-btn" (click)="closePopup()">×</button>
   </app-create-post>
 
 </div>
-<app-post-list></app-post-list>
+<app-post-list [newPost]="newPost"></app-post-list>
 
 

@@ -43,7 +43,7 @@ import { PostService } from '../../services/post.service';
   imports: [FormsModule, HttpClientModule]
 })
 export class CreatePostComponent {
-  @Output() postCreated = new EventEmitter<void>();
+@Output() postCreated = new EventEmitter<any>();
   description: string = '';
   file!: File | null;
 
@@ -64,12 +64,12 @@ export class CreatePostComponent {
   }
 
     this.postService.createPost(this.description,this.file?? undefined).subscribe({
-      next: (res) => {
+      next: (newPost) => {
         
         // alert('Post created successfully!');
         this.description = '';
         this.file = null;
-        this.postCreated.emit();
+        this.postCreated.emit(newPost);
       },
       error: (err) => {
         console.error(err);
