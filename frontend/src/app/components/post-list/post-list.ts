@@ -1,8 +1,7 @@
-import { Component, Input  } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PostService, Post } from '../../services/post.service';
 import { AuthService } from '../../auth/auth.service';
-
+import { PostService, Post } from '../../services/post.service';
 
 @Component({
   selector: 'app-post-list',
@@ -12,61 +11,44 @@ import { AuthService } from '../../auth/auth.service';
   imports: [CommonModule]
 })
 export class PostListComponent {
-  posts: Post[] = [];
-   @Input() newPost: any;
 
-   ngOnChanges() {
-    if (this.newPost) {
-      this.posts.unshift(this.newPost); // ← البوست الجديد اللول
-    }
+  @Input() posts: Post[] = [];
+  @Output() editRequested = new EventEmitter<Post>();
+  @Output() deleteRequested = new EventEmitter<number>();
+
+  constructor(
+    private postService: PostService,
+    public auth: AuthService
+  ) {}
+
+  toggleMenu(post: any) {
+    post.showMenu = !post.showMenu;
   }
-  constructor(private postService: PostService,public auth: AuthService) {
-    this.loadPosts();
 
+  editPost(post: Post) {
+    this.editRequested.emit(post);
   }
 
-  loadPosts() {
-    this.postService.getPosts().subscribe({
-      next: (data) => {
-        this.posts = data.map(p=>({...p,showMenu: false}))
-        console.log(this.posts);
-        
+  deletePost(id: number) {
+    if (!confirm("Vous voulez vraiment supprimer ce post ?")) return;
+
+    this.postService.deletePost(id).subscribe({
+      next: () => {
+       this.deleteRequested.emit(id); 
       },
       error: (err) => console.error(err)
     });
   }
+
   isImage(fileUrl: string | undefined): boolean {
-  if (!fileUrl) return false;
-  const ext = fileUrl.split('.').pop()?.toLowerCase();
-  return ext === 'jpg' || ext === 'jpeg' || ext === 'png' || ext === 'gif';
-}
+    if (!fileUrl) return false;
+    const ext = fileUrl.split('.').pop()?.toLowerCase();
+    return ['jpg','jpeg','png','gif'].includes(ext!);
+  }
 
-isVideo(fileUrl: string | undefined): boolean {
-  if (!fileUrl) return false;
-  const ext = fileUrl.split('.').pop()?.toLowerCase();
-  return ext === 'mp4' || ext === 'mov' || ext === 'webm';
-}
-toggleMenu(post: any) {
-  post.showMenu = !post.showMenu;
-}
-editPost(post: Post) {
-  console.log("Edit:", post);
-}
-
-deletePost(id: number) {
-  if (!confirm("Vous voulez vraiment supprimer ce post ?")) return;
-
-  this.postService.deletePost(id).subscribe({
-    next: () => {
-      // نحيدو البوست من اللائحة بلا ما نعاودو نجيبو من API
-      this.posts = this.posts.filter(p => p.id !== id);
-    },
-    error: (err) => console.error(err)
-  });
-}
-addPostOnTop() {
-  // غير سد popup ولا رجّع posts
-  this.loadPosts(); // أو أي حاجة كتديرها
-}
-
+  isVideo(fileUrl: string | undefined): boolean {
+    if (!fileUrl) return false;
+    const ext = fileUrl.split('.').pop()?.toLowerCase();
+    return ['mp4','mov','webm'].includes(ext!);
+  }
 }

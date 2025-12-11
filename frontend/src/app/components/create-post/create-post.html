@@ -1,56 +1,13 @@
-<!-- <div class="overlay" *ngIf="isOpen" (click)="close()"></div>
-
-<div class="modal" *ngIf="isOpen">
-  <h2>Create New Post</h2>
-
-  <form (ngSubmit)="submitPost()" #postForm="ngForm">
-    <div class="form-group">
-      <label>Title</label>
-      <input type="text" [(ngModel)]="title" name="title" required />
-    </div>
-
-    <div class="form-group">
-      <label>Content</label>
-      <textarea [(ngModel)]="content" name="content" required></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>Image/Video</label>
-      <input type="file" (change)="onFileSelected($event)" />
-    </div>
-
-    <button type="submit" [disabled]="!postForm.valid">Publish</button>
-  </form>
-</div> -->
-
-<!-- <div class="page-background">
-  <div class="post-card">
-    <h2>📝 Créer un nouveau post</h2>
-
-    <form (ngSubmit)="createPost()">
-      <div class="form-group">
-        <label>Titre :</label>
-        <input type="text" [(ngModel)]="title" name="title" required placeholder="Titre de votre post">
-      </div>
-
-      <div class="form-group">
-        <label>Contenu :</label>
-        <textarea [(ngModel)]="content" name="content" required placeholder="Écrivez votre contenu ici..."></textarea>
-      </div>
-
-      <button type="submit">Publier</button>
-    </form>
-</div>
-</div> -->
 <div class="create-post-form">
-  <h2>Create Post</h2>
+  <h2>{{ mode === 'create' ? 'Create Post' : 'Edit Post' }}</h2>
 
   <textarea [(ngModel)]="description" placeholder="Description..."></textarea>
   <input type="file" (change)="onFileSelected($event)" accept="image/*,video/*" />
 
   <div class="buttons">
-    <button (click)="submitPost()">Publish</button>
+    <button (click)="submitPost()">
+      {{ mode === 'create' ? 'Publish' : 'Save Changes' }}
+    </button>
   </div>
   <ng-content></ng-content>
 </div>
-

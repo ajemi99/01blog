@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,18 +11,16 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './register.css',
 })
 export class Register {
-   username = '';
+  username = '';
   email = '';
   password = '';
   message = signal('');
-  loading = false;
   isError = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
   async doRegister() {
     try {
-      // this.loading = true;
       this.isError = false;
       await this.auth.register(this.username, this.email, this.password);
       this.message.set('Inscription OK');
@@ -33,6 +31,6 @@ export class Register {
       
       this.message.set(msg);
     }
-    // this.loading = false;
+    
   }
 }

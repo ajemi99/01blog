@@ -2,6 +2,7 @@ package com.ajemi.backend.dto;
 
 import lombok.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,5 +15,5 @@ public class PostResponseDTO {
     private String mediaUrl;
     private Instant createdAt;
     private String authorUsername;
-    private int likes;
+     private LocalDateTime updatedAt;
 }

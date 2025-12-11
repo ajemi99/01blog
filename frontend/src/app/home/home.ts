@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
@@ -7,49 +7,39 @@ import { HttpClient } from '@angular/common/http';
 import { CreatePostComponent } from '../components/create-post/create-post';
 import { PostListComponent } from '../components/post-list/post-list';
 
-
 @Component({
   selector: 'app-home',
   standalone: true,
-    imports: [FormsModule, CommonModule,CreatePostComponent,PostListComponent],
- templateUrl: './home.html',
-
- styleUrl: './home.css',
+  imports: [FormsModule, CommonModule, CreatePostComponent, PostListComponent],
+  templateUrl: './home.html',
+  styleUrl: './home.css',
 })
-export class Home {
-  title = '';
-  content = '';
+export class Home implements OnInit {
+
   username = signal('');
-  roles = signal<string[]>([]);
-  showCreatePost = signal(false);
-  showPopup: boolean = false;
+  roles: string[] = [];
+  posts: any[] = [];
 
-  openCreatePost() {
-    this.showPopup = true;
-  }
+  showPopup = false;
+  editMode = false;
+  selectedPost: any = null;
 
-  newPost: any = null;
-
-  onPostCreated(post: any) {
-    this.newPost = post;   // كنصايفط البوست الجداد ل PostList
-    this.closePopup();     // نسد popup
-  }
-
-  closePopup() {
-    this.showPopup = false;
-  }
-  constructor(private auth: AuthService, private router: Router,private http: HttpClient) {
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private http: HttpClient
+  ) {
     auth.checkToken();
-
     const token = localStorage.getItem('token');
+
     if (token && token.split('.').length === 3) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         this.username.set(payload.sub);
         const roles = payload.roles || payload.role;
-        this.roles.set(Array.isArray(roles) ? roles : [roles]);
+        this.roles = Array.isArray(roles) ? roles : [roles];
       } catch (e) {
-        console.error('Erreur de décodage du token', e);
+        console.error('Erreur token', e);
         this.logout();
       }
     } else {
@@ -57,46 +47,51 @@ export class Home {
     }
   }
 
+  ngOnInit() {
+    this.loadPosts();
+  }
+
+  loadPosts() {
+    this.http.get("http://localhost:8080/api/posts").subscribe({
+      next: (data: any) => {
+        this.posts = data;
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  openCreatePost() {
+    this.editMode = false;
+    this.selectedPost = null;
+    this.showPopup = true;
+  }
+
+  openEditPost(post: any) {
+    this.editMode = true;
+    this.selectedPost = post;
+    this.showPopup = true;
+  }
+
+  onPostCreated(newPost: any) {
+    if (this.editMode) {
+      const index = this.posts.findIndex(p => p.id === newPost.id);
+      if (index > -1) this.posts[index] = newPost;
+    } else {
+      this.posts.unshift(newPost);
+    }
+
+    this.closePopup();
+  }
+
+  closePopup() {
+    this.showPopup = false;
+  }
+
   logout() {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
-  // goToCreatePost() {
-  //   this.router.navigate(['/create-post']);
-  // } 
-  selectedFile: File | null = null;
-
-onFileSelected(event: any) {
-  const file: File = event.target.files[0]; // ناخدو أول ملف
-  if (file) {
-    this.selectedFile = file;
-  }
+  deletePost(id: number) {
+  this.posts = this.posts.filter(post => post.id !== id);
 }
-// openCreatePost() {
-//   // hadi ghadi t7al popup / wla dir chi action
-//   console.log("Open create post!");
-// }
- createPost() {
-  if (!this.content) return;
-
-  const body = {
-
-    content:this.content
-  }
-
-
-  this.http.post('http://localhost:8080/api/posts', body).subscribe({
-    next: (res) => {
-      alert('✅ Post créé avec succès !');
-      this.title = '';
-      this.content = '';
-      this.showCreatePost.set(false);
-    },
-    error: (err) => {
-      console.error('Erreur création post', err);
-      alert('❌ Erreur lors de la création du post');
-    }
-  });
-}
-
 }

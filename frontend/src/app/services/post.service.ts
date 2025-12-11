@@ -8,7 +8,8 @@ export interface Post {
   mediaUrl?: string;
   authorUsername: string;
   createdAt: string;
-   showMenu?: boolean;
+  showMenu?: boolean;
+  updatedAt: string;
 }
 
 @Injectable({
@@ -34,4 +35,20 @@ export class PostService {
   deletePost(id: number) {
   return this.http.delete(`http://localhost:8080/api/posts/${id}`);
   }
+
+  updatePost(postId: number, description: string, file?: File) {
+  const formData = new FormData();
+  formData.append('description', description);
+
+  if (file) {
+    formData.append('file', file);
+  }
+
+  return this.http.put<Post>(
+    `http://localhost:8080/api/posts/${postId}`,
+    formData,
+    { withCredentials: true }
+  );
+}
+
 }

@@ -69,6 +69,8 @@ public class PostService {
         dto.setMediaUrl(post.getMediaUrl());
         dto.setCreatedAt(post.getCreatedAt());
         dto.setAuthorUsername(post.getAuthor().getUsername());
+        dto.setUpdatedAt(post.getUpdatedAt());
+
         // dto.setLikes(post.getLikes());
         return dto;
     }
@@ -89,6 +91,43 @@ public class PostService {
     // حذف البوست من قاعدة البيانات
     postRepository.deleteById(id);
 }
+// ===============================
+// Update Post (description + optional file)
+// ===============================
+public PostResponseDTO updatePost(Long id, String newDescription, MultipartFile newFile) {
+
+    // 1️⃣ جيب البوست من DB
+    Post post = postRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Post not found"));
+
+    // 2️⃣ Update description فقط إلا كانت ماشي null
+    if (newDescription != null && !newDescription.trim().isEmpty()) {
+        post.setDescription(newDescription);
+    }
+
+    // 3️⃣ إلا كان user بغا يبدل الصورة
+    if (newFile != null && !newFile.isEmpty()) {
+
+        // 🗑️ مسح الصورة القديمة إلا كانت موجودة
+        if (post.getMediaUrl() != null) {
+            File oldFile = new File("." + post.getMediaUrl());
+            if (oldFile.exists()) oldFile.delete();
+        }
+
+        // 💾 حفظ الصورة الجديدة
+        String newMediaUrl = fileStorageService.saveFile(newFile);
+        post.setMediaUrl(newMediaUrl);
+    }
+
+    // 4️⃣ update timestamp
+    post.setUpdatedAt(java.time.LocalDateTime.now());
+
+    // 5️⃣ Save changes
+    Post updated = postRepository.save(post);
+
+    return mapToDTO(updated);
+}
+
 
 }
 

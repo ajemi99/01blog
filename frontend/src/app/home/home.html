@@ -3,20 +3,23 @@
     <h1>📝 Mon Blog</h1>
     <button (click)="logout()">Déconnexion</button>
   </nav>
-<button class="create-post-btn" (click)="openCreatePost()">Create Post</button>
-  
+
+  <button class="create-post-btn" (click)="openCreatePost()">Create Post</button>
 </div>
-
-
 
 <!-- Popup -->
 <div class="popup" *ngIf="showPopup">
-  <app-create-post (postCreated)="onPostCreated($event)">
-
+  <app-create-post
+    [mode]="editMode ? 'edit' : 'create'"
+    [postData]="selectedPost"
+    (postCreated)="onPostCreated($event)">
     <button class="close-btn" (click)="closePopup()">×</button>
   </app-create-post>
-
 </div>
-<app-post-list [newPost]="newPost"></app-post-list>
 
-
+<!-- Posts List -->
+<app-post-list 
+  [posts]="posts" 
+  (editRequested)="openEditPost($event)"
+  (deleteRequested)="deletePost($event)">
+</app-post-list>
