@@ -10,6 +10,9 @@ export interface Post {
   createdAt: string;
   showMenu?: boolean;
   updatedAt: string;
+  likesCount: number;
+  liked?: boolean;
+  isLiking?: boolean; 
 }
 
 @Injectable({
@@ -50,5 +53,6 @@ export class PostService {
     { withCredentials: true }
   );
 }
+
 
 }

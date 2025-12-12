@@ -1,14 +1,23 @@
     package com.ajemi.backend.controller;
 
-    import com.ajemi.backend.dto.PostResponseDTO;
-    import com.ajemi.backend.service.PostService;
-    import lombok.RequiredArgsConstructor;
+    import java.util.List;
+
     import org.springframework.http.ResponseEntity;
     import org.springframework.security.core.Authentication;
-    import org.springframework.web.bind.annotation.*;
-    import org.springframework.web.multipart.MultipartFile;
+    import org.springframework.web.bind.annotation.DeleteMapping;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.PathVariable;
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-    import java.util.List;
+import com.ajemi.backend.dto.PostResponseDTO;
+import com.ajemi.backend.service.PostService;
+
+import lombok.RequiredArgsConstructor;
 
 
     @RestController
@@ -45,11 +54,13 @@
         // ===============================
         // Get all posts (feed)
         // ===============================
-        @GetMapping
-        public ResponseEntity<List<PostResponseDTO>> getAllPosts() {
-            List<PostResponseDTO> posts = postService.getAllPosts();
-            return ResponseEntity.ok(posts);
-        }
+    @GetMapping
+    public ResponseEntity<List<PostResponseDTO>> getAllPosts(Authentication auth) {
+    String username = auth.getName();
+    List<PostResponseDTO> posts = postService.getAllPosts(username);
+    return ResponseEntity.ok(posts);
+}
+
         @DeleteMapping("/{id}")
         public ResponseEntity<?> deletePost(@PathVariable Long id) {
             try {
@@ -61,11 +72,13 @@
         }
         @PutMapping(value = "/{id}", consumes = "multipart/form-data")
         public ResponseEntity<?> updatePost(
+            Authentication auth,
          @PathVariable Long id,
              @RequestPart(required = false) String description,
         @RequestPart(required = false) MultipartFile file
         ) {
-             PostResponseDTO updated = postService.updatePost(id, description, file);
+            String username = auth.getName();
+             PostResponseDTO updated = postService.updatePost(id, description, file,username);
              return ResponseEntity.ok(updated);
             }
 

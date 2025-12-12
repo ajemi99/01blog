@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter,OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
 import { PostService, Post } from '../../services/post.service';
+ import { LikeService } from '../../services/LikeService'; 
 
 @Component({
   selector: 'app-post-list',
@@ -10,16 +11,51 @@ import { PostService, Post } from '../../services/post.service';
   standalone: true,
   imports: [CommonModule]
 })
-export class PostListComponent {
+export class PostListComponent{
 
   @Input() posts: Post[] = [];
   @Output() editRequested = new EventEmitter<Post>();
   @Output() deleteRequested = new EventEmitter<number>();
 
-  constructor(
+ constructor(
     private postService: PostService,
-    public auth: AuthService
+  public auth: AuthService,
+   private likeService: LikeService
   ) {}
+
+
+toggleLike(post: Post) {
+  // إذا راه كاين request جارية → مانديروش click
+  if (post.isLiking) return;  
+
+  post.isLiking = true; // عطينا signal أن request جارية
+
+  this.likeService.toggleLike(post.id).subscribe(
+    res => {
+      if (res.message === 'liked') {
+        post.liked = true;
+        post.likesCount++;
+      } else {
+        post.liked = false;
+        post.likesCount--;
+      }
+      post.isLiking = false; // رجع button active
+    },
+    err => {
+      console.error(err);
+      post.isLiking = false; // حتى إلا كان error رجع button active
+    }
+  );
+}
+
+
+// getLikesCount(post: Post) {
+//   this.likeService.getLikesCount(post.id).subscribe(res => {
+//     post.likesCount = res.likesCount;
+//   });
+// }
+
+  
 
   toggleMenu(post: any) {
     post.showMenu = !post.showMenu;
@@ -39,6 +75,9 @@ export class PostListComponent {
       error: (err) => console.error(err)
     });
   }
+
+
+
 
   isImage(fileUrl: string | undefined): boolean {
     if (!fileUrl) return false;

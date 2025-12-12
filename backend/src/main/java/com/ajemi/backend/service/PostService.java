@@ -1,6 +1,11 @@
 package com.ajemi.backend.service;
 
 import java.io.File;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ajemi.backend.dto.PostResponseDTO;
 import com.ajemi.backend.entity.Post;
@@ -9,12 +14,6 @@ import com.ajemi.backend.repository.PostRepository;
 import com.ajemi.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,34 +45,42 @@ public class PostService {
         Post saved = postRepository.save(post);
 
         // 5️⃣ Map Entity → DTO
-        return mapToDTO(saved);
+        return mapToDTO(saved,username);
     }
 
     // ===============================
     // Get all posts (feed)
     // ===============================
-    public List<PostResponseDTO> getAllPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public List<PostResponseDTO> getAllPosts(String currentUsername) {
+    return postRepository.findAllByOrderByCreatedAtDesc()
+            .stream()
+            .map(post -> mapToDTO(post, currentUsername))
+            .collect(Collectors.toList());
     }
 
     // ===============================
     // Convert Post entity to DTO
     // ===============================
-    private PostResponseDTO mapToDTO(Post post) {
-        PostResponseDTO dto = new PostResponseDTO();
-        dto.setId(post.getId());
-        dto.setDescription(post.getDescription());
-        dto.setMediaUrl(post.getMediaUrl());
-        dto.setCreatedAt(post.getCreatedAt());
-        dto.setAuthorUsername(post.getAuthor().getUsername());
-        dto.setUpdatedAt(post.getUpdatedAt());
+   private PostResponseDTO mapToDTO(Post post, String currentUsername) {
+    PostResponseDTO dto = new PostResponseDTO();
+    dto.setId(post.getId());
+    dto.setDescription(post.getDescription());
+    dto.setMediaUrl(post.getMediaUrl());
+    dto.setCreatedAt(post.getCreatedAt());
+    dto.setAuthorUsername(post.getAuthor().getUsername());
+    dto.setUpdatedAt(post.getUpdatedAt());
 
-        // dto.setLikes(post.getLikes());
-        return dto;
-    }
+    // عدد likes
+    dto.setLikesCount(post.getLikes().size());
+
+    // واش user دار like
+    boolean liked = post.getLikes().stream()
+            .anyMatch(like -> like.getUser().getUsername().equals(currentUsername));
+    dto.setLiked(liked);
+
+    return dto;
+}
+
     public void deletePost(Long id) {
 
     Post post = postRepository.findById(id)
@@ -94,7 +101,7 @@ public class PostService {
 // ===============================
 // Update Post (description + optional file)
 // ===============================
-public PostResponseDTO updatePost(Long id, String newDescription, MultipartFile newFile) {
+public PostResponseDTO updatePost(Long id, String newDescription, MultipartFile newFile,String userName) {
 
     // 1️⃣ جيب البوست من DB
     Post post = postRepository.findById(id)
@@ -125,7 +132,7 @@ public PostResponseDTO updatePost(Long id, String newDescription, MultipartFile 
     // 5️⃣ Save changes
     Post updated = postRepository.save(post);
 
-    return mapToDTO(updated);
+    return mapToDTO(updated,userName);
 }
 
 

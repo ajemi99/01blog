@@ -1,8 +1,12 @@
 package com.ajemi.backend.dto;
 
-import lombok.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -16,4 +20,10 @@ public class PostResponseDTO {
     private Instant createdAt;
     private String authorUsername;
      private LocalDateTime updatedAt;
+      // ✅ جديد: واش user دار like
+    private Boolean liked = false;
+
+    // optional: عدد likes
+    private int likesCount = 0;
+
 }

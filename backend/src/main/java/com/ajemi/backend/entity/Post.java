@@ -2,15 +2,19 @@ package com.ajemi.backend.entity;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-import jakarta.persistence.*;
-// import lombok.Data;
-
-// import java.time.LocalDateTime;
-// import java.util.*;
-
-// import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,39 +41,8 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Like> likes = new ArrayList<>();
+   
 }
-
-
-// @Entity
-// @Table(name = "posts")
-// @Data
-// @JsonIgnoreProperties({"comments", "likes"})
-// public class Post {
-
-//     @Id
-//     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//     private Long id;
-
-//     @ManyToOne
- 
-//     @JoinColumn(name = "user_id")
-//     private User user;
-
-//     @Column(columnDefinition = "TEXT")
-//     private String content;
-
-//     private String mediaUrl;
-
-//     private LocalDateTime createdAt = LocalDateTime.now();
-
-//     // 🔗 Relations
-//     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-//     private List<Comment> comments = new ArrayList<>();
-
-//     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-//     private List<Like> likes = new ArrayList<>();
-
-//     public Post() {}
-
-//     // getters et setters
-// }

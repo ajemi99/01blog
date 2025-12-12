@@ -55,6 +55,8 @@ export class Home implements OnInit {
     this.http.get("http://localhost:8080/api/posts").subscribe({
       next: (data: any) => {
         this.posts = data;
+        console.log(data);
+        
       },
       error: (err) => console.error(err)
     });

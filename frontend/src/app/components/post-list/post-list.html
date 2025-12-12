@@ -28,5 +28,10 @@
   <video *ngIf="isVideo(post.mediaUrl)" controls>
     <source [src]="'http://localhost:8080' + post.mediaUrl" />
   </video>
+<button (click)="toggleLike(post)" [disabled]="post.isLiking">
+  {{ post.liked ? '❤️' : '🤍' }}
+</button>
+<br>
+<span>{{ post.likesCount }} Like{{ post.likesCount > 1 ? 's' : '' }}</span>
 
 </div>
