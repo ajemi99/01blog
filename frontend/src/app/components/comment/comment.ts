@@ -3,6 +3,7 @@ import { CommentService,CommentRequest,CommentResponse } from '../../services/co
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service'; 
+import { Post } from '../../services/post.service';
 
 @Component({
   selector: 'app-comment',
@@ -13,7 +14,7 @@ import { AuthService } from '../../auth/auth.service';
 export class CommentComponent implements OnInit {
   @Input() postId!: number;      // ID du post pour lequel on affiche les commentaires
   @Input() userId!: number;      // ID de l'utilisateur connecté
-
+  posts : Post[]=[] ;
   comments: CommentResponse[] = [];
   newComment: string = '';
   latestCommentId: number | null = null;

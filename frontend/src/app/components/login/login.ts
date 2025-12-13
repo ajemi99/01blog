@@ -17,7 +17,14 @@ export class Login {
   isError = false;
 
   constructor(private auth: AuthService ,private router: Router) {}
-
+ngOnInit() {
+  const token: string | null = localStorage.getItem('token');
+  if (token) {
+    // parse token w set currentUser
+    
+    this.router.navigate(['/home']);
+  }
+} 
   async doLogin() {
     try {
 

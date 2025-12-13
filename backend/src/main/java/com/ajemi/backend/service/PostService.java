@@ -135,6 +135,12 @@ public PostResponseDTO updatePost(Long id, String newDescription, MultipartFile 
     return mapToDTO(updated,userName);
 }
 
+public List<PostResponseDTO> getMyPosts(Long authorId, String username) {
+    List<Post> posts = postRepository.findByAuthor_IdOrderByCreatedAtDesc(authorId);
+    return posts.stream()
+                .map(post -> mapToDTO(post, username))
+                .collect(Collectors.toList());
+}
 
 }
 

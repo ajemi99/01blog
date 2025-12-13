@@ -82,7 +82,11 @@ import lombok.RequiredArgsConstructor;
              return ResponseEntity.ok(updated);
             }
 
-        
+        @GetMapping("/my-posts/{userId}")
+    public List<PostResponseDTO> getMyPosts(@PathVariable Long userId,Authentication auth) {
+         String username = auth.getName();
+        return postService.getMyPosts(userId,username);
+    }
     }
 
 

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { CommentResponse } from './comment.service';
 
 export interface Post {
   id: number;
@@ -14,6 +15,8 @@ export interface Post {
   liked?: boolean;
   isLiking?: boolean; 
   showComments?: boolean; 
+  comments?: CommentResponse[];
+  newComment?: string;
 }
 
 @Injectable({
@@ -53,6 +56,9 @@ export class PostService {
     formData,
     { withCredentials: true }
   );
+}
+getMyPosts(userId: number): Observable<Post[]> {
+  return this.http.get<Post[]>(`${this.apiUrl}/my-posts/${userId}`);
 }
 
 

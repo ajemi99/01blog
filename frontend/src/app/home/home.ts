@@ -19,7 +19,7 @@ export class Home implements OnInit {
   username = signal('');
   roles: string[] = [];
   posts: any[] = [];
-
+  showMyPosts: boolean = false;
   showPopup = false;
   editMode = false;
   selectedPost: any = null;
@@ -47,6 +47,11 @@ export class Home implements OnInit {
     }
   }
 
+  goToMyPosts() {
+    console.log(this.username);
+    
+    this.router.navigate(['/my-posts']);
+  }
   ngOnInit() {
     this.loadPosts();
   }

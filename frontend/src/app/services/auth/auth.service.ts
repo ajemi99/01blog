@@ -9,7 +9,9 @@ export class AuthService {
   currentUser: any = null;
 
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.checkToken(); 
+  }
 
   get token(): string | null {
     return localStorage.getItem(this.tokenKey);
@@ -42,12 +44,13 @@ export class AuthService {
     try {
       // On envoie la requête vers le backend pour vérifier la validité du token
       const user = await firstValueFrom(this.http.get<{ id: number; username: string }>(`${this.baseUrl}/me`));
-this.currentUser = user;
-console.log("User from backend:", this.currentUser);
+      this.currentUser = user;
+      console.log("User", this.currentUser);
     } catch (err) {
       console.error('Token invalide ou expiré ❌', err);
       this.logout(); // redirection vers login
       window.location.href = '/login';
     }
   }
+  
 }

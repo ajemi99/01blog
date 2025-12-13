@@ -18,7 +18,13 @@ export class Register {
   isError = false;
 
   constructor(private auth: AuthService, private router: Router) {}
-
+ngOnInit() {
+  const token: string | null = localStorage.getItem('token');
+  if (token) {
+    
+    this.router.navigate(['/home']);
+  }
+} 
   async doRegister() {
     try {
       this.isError = false;
