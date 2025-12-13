@@ -3,20 +3,30 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
 import { PostService, Post } from '../../services/post.service';
  import { LikeService } from '../../services/LikeService'; 
+import { CommentComponent } from '../comment/comment';
+
 
 @Component({
   selector: 'app-post-list',
   templateUrl: './post-list.html',
   styleUrls: ['./post-list.css'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule,CommentComponent]
 })
 export class PostListComponent{
 
   @Input() posts: Post[] = [];
   @Output() editRequested = new EventEmitter<Post>();
   @Output() deleteRequested = new EventEmitter<number>();
+  selectedPostId: number | null = null;
 
+openComments(post: any) {
+  this.selectedPostId = post.id;
+}
+
+closeComments() {
+  this.selectedPostId = null;
+}
  constructor(
     private postService: PostService,
   public auth: AuthService,

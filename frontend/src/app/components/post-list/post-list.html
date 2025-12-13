@@ -33,5 +33,20 @@
 </button>
 <br>
 <span>{{ post.likesCount }} Like{{ post.likesCount > 1 ? 's' : '' }}</span>
+<!-- زر باش نعرضو التعليقات -->
+<button (click)="openComments(post)">💬 Commentaires</button>
+
+
+<!-- Popup modal -->
+<div class="modal-backdrop" *ngIf="selectedPostId">
+  <div class="modal">
+    <button class="close-btn" (click)="closeComments()">✖</button>
+    <app-comment 
+      [postId]="selectedPostId" 
+      [userId]="auth.currentUser?.id">
+    </app-comment>
+  </div>
+</div>
+
 
 </div>

@@ -13,6 +13,7 @@ export interface Post {
   likesCount: number;
   liked?: boolean;
   isLiking?: boolean; 
+  showComments?: boolean; 
 }
 
 @Injectable({
