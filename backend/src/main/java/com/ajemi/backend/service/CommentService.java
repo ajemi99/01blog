@@ -25,6 +25,7 @@ public class CommentService {
     private final UserRepository userRepository;
 
     public CommentResponseDTO addComment(Long userId, CommentRequestDTO request) {
+        
         Post post = postRepository.findById(request.getPostId())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         User user = userRepository.findById(userId)

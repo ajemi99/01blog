@@ -1,6 +1,7 @@
 package com.ajemi.backend.config;
 
-import com.ajemi.backend.security.JwtAuthFilter;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,10 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
+import com.ajemi.backend.security.JwtAuthFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -48,13 +49,11 @@ public CorsConfigurationSource corsConfigurationSource() {
     source.registerCorsConfiguration("/**", configuration);
     return source;
 }
-
 @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        .cors() 
-        .and()
         .csrf(csrf -> csrf.disable())
+        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // <--- hna
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**", "/api/test").permitAll()
@@ -67,4 +66,22 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 }
 
 
+
+
 }
+// @Bean
+// public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//     http
+//         .cors() 
+//         .and()
+//         .csrf(csrf -> csrf.disable())
+//         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//         .authorizeHttpRequests(auth -> auth
+//             .requestMatchers("/api/auth/**", "/api/test").permitAll()
+//             .requestMatchers("/uploads/**").permitAll()
+//             .anyRequest().authenticated()
+//         )
+//         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+//     return http.build();
+// }

@@ -1,16 +1,14 @@
 package com.ajemi.backend.service;
 
+import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-
-
 
 @Service
 public class FileStorageService {
@@ -20,8 +18,8 @@ public class FileStorageService {
     public FileStorageService() {
         try {
             Files.createDirectories(root);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not create upload folder!");
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create upload folder!", e);
         }
     }
 
@@ -29,10 +27,11 @@ public class FileStorageService {
         if (file == null || file.isEmpty()) return null;
 
         try {
+            String originalFilename = file.getOriginalFilename();
             String ext = "";
-            if (file.getOriginalFilename().contains(".")) {
-                ext = file.getOriginalFilename()
-                        .substring(file.getOriginalFilename().lastIndexOf("."));
+
+            if (originalFilename != null && originalFilename.contains(".")) {
+                ext = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
 
             String filename = UUID.randomUUID() + ext;
@@ -45,8 +44,8 @@ public class FileStorageService {
 
             return "/uploads/" + filename;
 
-        } catch (Exception e) {
-            throw new RuntimeException("Could not store the file!");
+        } catch (IOException e) {
+            throw new RuntimeException("Could not store the file!", e);
         }
     }
 }
