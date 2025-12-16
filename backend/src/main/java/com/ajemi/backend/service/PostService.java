@@ -68,6 +68,7 @@ public class PostService {
     dto.setMediaUrl(post.getMediaUrl());
     dto.setCreatedAt(post.getCreatedAt());
     dto.setAuthorUsername(post.getAuthor().getUsername());
+    dto.setAuthorId(post.getAuthor().getId());
     dto.setUpdatedAt(post.getUpdatedAt());
 
     // عدد likes

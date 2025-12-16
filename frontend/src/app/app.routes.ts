@@ -10,6 +10,7 @@ export const routes: Routes = [
   { path: 'register', component: Register },
   { path: 'home', component: Home, canActivate: [authGuard] },
   { path: 'my-posts', component: MyPostsComponent },
+  { path: 'user-posts/:id', component: MyPostsComponent },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: '**', redirectTo: 'home' },
 

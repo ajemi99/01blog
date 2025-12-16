@@ -4,6 +4,7 @@ import { AuthService } from '../../auth/auth.service';
 import { PostService, Post } from '../../services/post.service';
  import { LikeService } from '../../services/LikeService'; 
 import { CommentComponent } from '../comment/comment';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -29,8 +30,9 @@ closeComments() {
 }
  constructor(
     private postService: PostService,
-  public auth: AuthService,
-   private likeService: LikeService
+    public auth: AuthService,
+   private likeService: LikeService,
+   private router: Router
   ) {}
 
 
@@ -85,7 +87,9 @@ toggleLike(post: Post) {
       error: (err) => console.error(err)
     });
   }
-
+goToUserPosts(userId: number) {
+  this.router.navigate(['/user-posts', userId]);
+}
 
 
 

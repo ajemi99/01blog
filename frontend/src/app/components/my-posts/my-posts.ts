@@ -4,6 +4,8 @@ import { AuthService } from '../../auth/auth.service';
 import { CommentService } from '../../services/comment.service';
 import { PostListComponent } from '../post-list/post-list';
 import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
   selector: 'app-my-posts',
@@ -18,21 +20,32 @@ export class MyPostsComponent implements OnInit {
 
   constructor(
     private postService: PostService,
-    private commentService: CommentService,
     public auth: AuthService,
-    public router: Router
+    public router: Router,
+    private route: ActivatedRoute
   ) {}
 
 async ngOnInit() {
-  await this.auth.checkToken(); // ensures currentUser is set
+  await this.auth.checkToken();
+
   if (!this.auth.currentUser) {
     this.router.navigate(['/login']);
     return;
   }
 
-  this.userId = this.auth.currentUser.id;
+  const routeUserId = this.route.snapshot.paramMap.get('id');
+
+  if (routeUserId) {
+    // جاينا من click على username
+    this.userId = Number(routeUserId);
+  } else {
+    // Mes Posts
+    this.userId = this.auth.currentUser.id;
+  }
+
   this.loadMyPosts();
 }
+
 
   loadMyPosts() {
   

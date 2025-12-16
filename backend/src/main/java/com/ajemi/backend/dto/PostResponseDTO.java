@@ -18,6 +18,7 @@ public class PostResponseDTO {
     private String description;
     private String mediaUrl;
     private Instant createdAt;
+    private Long authorId;
     private String authorUsername;
      private LocalDateTime updatedAt;
       // ✅ جديد: واش user دار like

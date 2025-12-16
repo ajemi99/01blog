@@ -6,6 +6,7 @@ import { CommentResponse } from './comment.service';
 export interface Post {
   id: number;
   description: string;
+  authorId: number; 
   mediaUrl?: string;
   authorUsername: string;
   createdAt: string;

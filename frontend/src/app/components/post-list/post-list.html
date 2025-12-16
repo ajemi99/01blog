@@ -20,7 +20,8 @@
 
   </div>
 
-  <h3>By: {{ post.authorUsername }} | {{ post.createdAt | date:'short' }}</h3>
+  <h3 (click)="goToUserPosts(post.authorId)">By: {{ post.authorUsername }}</h3> 
+  <h3>{{ post.createdAt | date:'short' }}</h3> 
   <p>{{ post.description }}</p>
 
   <img *ngIf="isImage(post.mediaUrl)" [src]="'http://localhost:8080' + post.mediaUrl" alt="post image" />
