@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ajemi.backend.dto.PostResponseDTO;
@@ -26,6 +27,7 @@ public class PostService {
     // ===============================
     // Create a new post
     // ===============================
+    @Transactional
     public PostResponseDTO createPost(String username, String description, MultipartFile file) {
 
         // 1️⃣ Get user from DB
@@ -51,6 +53,7 @@ public class PostService {
     // ===============================
     // Get all posts (feed)
     // ===============================
+    @Transactional(readOnly = true)
     public List<PostResponseDTO> getAllPosts(String currentUsername) {
     return postRepository.findAllByOrderByCreatedAtDesc()
             .stream()
@@ -81,7 +84,8 @@ public class PostService {
 
     return dto;
 }
-
+    
+@Transactional
     public void deletePost(Long id) {
 
     Post post = postRepository.findById(id)
@@ -102,6 +106,7 @@ public class PostService {
 // ===============================
 // Update Post (description + optional file)
 // ===============================
+@Transactional
 public PostResponseDTO updatePost(Long id, String newDescription, MultipartFile newFile,String userName) {
 
     // 1️⃣ جيب البوست من DB
@@ -135,7 +140,7 @@ public PostResponseDTO updatePost(Long id, String newDescription, MultipartFile 
 
     return mapToDTO(updated,userName);
 }
-
+@Transactional(readOnly = true)
 public List<PostResponseDTO> getMyPosts(Long authorId, String username) {
     List<Post> posts = postRepository.findByAuthor_IdOrderByCreatedAtDesc(authorId);
     return posts.stream()

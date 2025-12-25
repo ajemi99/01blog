@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
@@ -36,6 +37,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     private String bio;
@@ -48,34 +50,35 @@ public class User {
     private Role role ;
 
     // 📝 Relation avec les posts
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
    
     private List<Post> posts = new ArrayList<>();
 
     // 💬 Relation avec les commentaires
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
     // ❤️ Relation avec les likes
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Like> likes = new ArrayList<>();
 
     // 👥 Relation avec les abonnements
-    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
     private List<Subscription> following = new ArrayList<>();
 
-    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Subscription> followers = new ArrayList<>();
 
     // 🔔 Notifications
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Notification> notifications = new ArrayList<>();
 
     // 🚨 Signalements
-    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Report> reportsSent = new ArrayList<>();
 
-    @OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Report> reportsReceived = new ArrayList<>();
     
 

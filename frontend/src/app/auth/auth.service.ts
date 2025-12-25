@@ -32,6 +32,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
   }
+  
   async checkToken(): Promise<void> {
     const token = this.token;
     if (!token) {
