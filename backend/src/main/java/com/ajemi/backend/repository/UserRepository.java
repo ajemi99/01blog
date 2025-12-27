@@ -1,9 +1,11 @@
 package com.ajemi.backend.repository;
 
-import com.ajemi.backend.entity.User;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import com.ajemi.backend.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -14,4 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+
+    List<User> findByUsernameContainingIgnoreCase(String username);
 }
