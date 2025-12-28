@@ -67,7 +67,7 @@ public class User {
 
     private List<Subscription> following = new ArrayList<>();
 
-    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Subscription> followers = new ArrayList<>();
 
     // 🔔 Notifications
