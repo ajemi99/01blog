@@ -1,18 +1,20 @@
 package com.ajemi.backend.service;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import com.ajemi.backend.entity.Role;
 import com.ajemi.backend.dto.PostResponseDTO;
 import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.PostRepository;
 import com.ajemi.backend.repository.UserRepository;
+import com.ajemi.backend.repository.FollowRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +25,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
+    private final FollowRepository followRepository;
 
     // ===============================
     // Create a new post
@@ -53,13 +56,26 @@ public class PostService {
     // ===============================
     // Get all posts (feed)
     // ===============================
-    @Transactional(readOnly = true)
-    public List<PostResponseDTO> getAllPosts(String currentUsername) {
-    return postRepository.findAllByOrderByCreatedAtDesc()
-            .stream()
-            .map(post -> mapToDTO(post, currentUsername))
-            .collect(Collectors.toList());
+@Transactional(readOnly = true)
+public List<PostResponseDTO> getAllPostsForAdmin(String adminUsername) {
+    try {
+       User admin = userRepository.findByUsername(adminUsername)
+        .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (admin.getRole() == null || admin.getRole().getName() != Role.RoleName.ADMIN) {
+            throw new RuntimeException("Forbidden");
+        }
+
+        return postRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(post -> mapToDTO(post, adminUsername))
+                .toList();
+    } catch (Exception e) {
+        e.printStackTrace(); // هنا غادي تشوف الخطأ فـ console ديال Spring
+        throw e;
     }
+}
+
 
     // ===============================
     // Convert Post entity to DTO
@@ -86,35 +102,34 @@ public class PostService {
 }
     
 @Transactional
-    public void deletePost(Long id) {
+    public void deletePost(Long id, String username) {
 
     Post post = postRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Post not found"));
-
-    // احذف الملف إذا كان موجود
-    if (post.getMediaUrl() != null) {
-        String filePath = "uploads" + post.getMediaUrl(); // mediaUrl = "/uploads/xxxx.jpg"
-        File file = new File("." + post.getMediaUrl());   // ملف داخل project
-        if (file.exists()) {
-            file.delete();
+         if (!post.getAuthor().getUsername().equals(username)) {
+            throw new RuntimeException("Unauthorized");
         }
-    }
+    // احذف الملف إذا كان موجود
+        deleteFile(post.getMediaUrl());
 
     // حذف البوست من قاعدة البيانات
-    postRepository.deleteById(id);
+    postRepository.delete(post);
 }
 // ===============================
 // Update Post (description + optional file)
 // ===============================
 @Transactional
-public PostResponseDTO updatePost(Long id, String newDescription, MultipartFile newFile,String userName) {
+public PostResponseDTO updatePost(Long id, String username,  String newDescription, MultipartFile newFile) {
 
     // 1️⃣ جيب البوست من DB
     Post post = postRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Post not found"));
 
+        if (!post.getAuthor().getUsername().equals(username)) {
+            throw new RuntimeException("Unauthorized");
+        }
     // 2️⃣ Update description فقط إلا كانت ماشي null
-    if (newDescription != null && !newDescription.trim().isEmpty()) {
+    if (newDescription != null  && !newDescription.isBlank()) {
         post.setDescription(newDescription);
     }
 
@@ -122,10 +137,7 @@ public PostResponseDTO updatePost(Long id, String newDescription, MultipartFile 
     if (newFile != null && !newFile.isEmpty()) {
 
         // 🗑️ مسح الصورة القديمة إلا كانت موجودة
-        if (post.getMediaUrl() != null) {
-            File oldFile = new File("." + post.getMediaUrl());
-            if (oldFile.exists()) oldFile.delete();
-        }
+        deleteFile(post.getMediaUrl());
 
         // 💾 حفظ الصورة الجديدة
         String newMediaUrl = fileStorageService.saveFile(newFile);
@@ -138,7 +150,13 @@ public PostResponseDTO updatePost(Long id, String newDescription, MultipartFile 
     // 5️⃣ Save changes
     Post updated = postRepository.save(post);
 
-    return mapToDTO(updated,userName);
+    return mapToDTO(updated,username);
+}
+private void deleteFile(String mediaUrl) {
+    if (mediaUrl != null) {
+        File file = new File("." + mediaUrl);
+        if (file.exists()) file.delete();
+    }
 }
 @Transactional(readOnly = true)
 public List<PostResponseDTO> getMyPosts(Long authorId, String username) {
@@ -146,6 +164,25 @@ public List<PostResponseDTO> getMyPosts(Long authorId, String username) {
     return posts.stream()
                 .map(post -> mapToDTO(post, username))
                 .collect(Collectors.toList());
+}
+@Transactional(readOnly = true)
+public List<PostResponseDTO> getFeed(Authentication authentication) {
+
+    String username = authentication.getName();
+
+    User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    List<Long> followingIds = new ArrayList<>(
+            followRepository.findFollowingIds(user.getId())
+    );
+    followingIds.add(user.getId());
+
+    return postRepository
+            .findAllByAuthor_IdInOrderByCreatedAtDesc(followingIds)
+            .stream()
+            .map(post -> mapToDTO(post, username))
+            .toList();
 }
 
 }

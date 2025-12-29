@@ -56,16 +56,28 @@ export class Home implements OnInit {
     this.loadPosts();
   }
 
-  loadPosts() {
-    this.http.get("http://localhost:8080/api/posts").subscribe({
-      next: (data: any) => {
-        this.posts = data;
-        console.log(data);
-        
-      },
-      error: (err) => console.error(err)
-    });
+loadPosts() {
+  console.log("User roles:", this.roles);
+
+  if (!this.roles || this.roles.length === 0) {
+    console.warn("No roles found, default to user feed");
   }
+
+  let url = "http://localhost:8080/api/posts/feed"; // default user feed
+  if (this.roles && this.roles.includes("ADMIN")) {
+    url = "http://localhost:8080/api/admin/posts"; // admin sees all
+  }
+
+  this.http.get(url).subscribe({
+    next: (data: any) => {
+      this.posts = data;
+      console.log(data);
+    },
+    error: (err) => console.error(err)
+  });
+}
+
+
 
   openCreatePost() {
     this.editMode = false;

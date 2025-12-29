@@ -28,8 +28,4 @@ public class Role {
         ADMIN
     }
 
-    // public Object stream() {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'stream'");
-    // }
 }

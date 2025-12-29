@@ -1,5 +1,5 @@
     package com.ajemi.backend.controller;
-
+    
     import java.util.List;
 
     import org.springframework.http.ResponseEntity;
@@ -51,41 +51,52 @@ import lombok.RequiredArgsConstructor;
             return ResponseEntity.ok(dto);
         }
 
-        // ===============================
-        // Get all posts (feed)
-        // ===============================
-    @GetMapping
-    public ResponseEntity<List<PostResponseDTO>> getAllPosts(Authentication auth) {
-    String username = auth.getName();
-    List<PostResponseDTO> posts = postService.getAllPosts(username);
-    return ResponseEntity.ok(posts);
-}
 
-        @DeleteMapping("/{id}")
-        public ResponseEntity<?> deletePost(@PathVariable Long id) {
-            try {
-                postService.deletePost(id);
-                return ResponseEntity.ok().build();
-            } catch (Exception e) {
-                return ResponseEntity.status(500).body("Error deleting post: " + e.getMessage());
-            }
-        }
+@DeleteMapping("/{id}")
+public ResponseEntity<?> deletePost(@PathVariable Long id,
+                                    Authentication authentication) {
+    try {
+        String username = authentication.getName(); // من JWT
+        postService.deletePost(id, username);
+        return ResponseEntity.ok().build();
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(403).body(e.getMessage());
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body("Error deleting post");
+    }
+}
         @PutMapping(value = "/{id}", consumes = "multipart/form-data")
         public ResponseEntity<?> updatePost(
             Authentication auth,
-         @PathVariable Long id,
+            @PathVariable Long id,
              @RequestPart(required = false) String description,
-        @RequestPart(required = false) MultipartFile file
+            @RequestPart(required = false) MultipartFile file,
+            Authentication authentication
         ) {
-            String username = auth.getName();
-             PostResponseDTO updated = postService.updatePost(id, description, file,username);
-             return ResponseEntity.ok(updated);
-            }
+    try {
+        String username = authentication.getName(); // من JWT
+
+        return ResponseEntity.ok(
+                postService.updatePost(id, username, description, file)
+        );
+
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(403).body(e.getMessage());
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body("Error updating post");
+    }
+        }
+
 
         @GetMapping("/my-posts/{userId}")
     public List<PostResponseDTO> getMyPosts(@PathVariable Long userId,Authentication auth) {
          String username = auth.getName();
         return postService.getMyPosts(userId,username);
+    }
+
+    @GetMapping("/feed")
+    public List<PostResponseDTO> getFeed(Authentication authentication) {
+        return postService.getFeed(authentication);
     }
     }
 

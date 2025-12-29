@@ -9,6 +9,7 @@ import com.ajemi.backend.repository.UserRepository;
 import com.ajemi.backend.entity.User;
 import lombok.RequiredArgsConstructor;
 import com.ajemi.backend.entity.Subscription;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +17,7 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public void follow(Long followerId, Long followingId) {
     if (followerId.equals(followingId)) {
         throw new ResponseStatusException(
@@ -41,7 +43,6 @@ public class FollowService {
         followRepository.save(follow);
 
     }
-
     public void unfollow(Long followerId, Long followingId){
         followRepository.deleteByFollowerIdAndFollowingId(followerId,followingId);
     }
