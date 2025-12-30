@@ -4,12 +4,14 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ajemi.backend.security.UserDetailsImpl;
 import com.ajemi.backend.service.LikeService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,11 +26,11 @@ public class LikeController {
     @PostMapping("/{postId}")
     public ResponseEntity<?> toggleLike(
             @PathVariable Long postId,
-            Authentication auth
+           @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        String username = auth.getName();
+        String username = userDetails.getUsername();
         String result = likeService.toggleLike(postId, username);
-return ResponseEntity.ok(Map.of("message", result));    }
+        return ResponseEntity.ok(Map.of("message", result));  }
 
     @GetMapping("/{postId}")
     public ResponseEntity<?> getLikesCount(@PathVariable Long postId) {

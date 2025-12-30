@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.ajemi.backend.dto.CommentRequestDTO;
 import com.ajemi.backend.dto.CommentResponseDTO;
 import com.ajemi.backend.entity.Comment;
+import com.ajemi.backend.entity.Notification.NotificationType;
 import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.CommentRepository;
@@ -23,20 +24,29 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+     private final NotificationService notificationService;
 
     public CommentResponseDTO addComment(Long userId, CommentRequestDTO request) {
         
         Post post = postRepository.findById(request.getPostId())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
-        User user = userRepository.findById(userId)
+        User actor = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
+        User receiver = post.getAuthor();
         Comment comment = new Comment();
         comment.setPost(post);
-        comment.setUser(user);
+        comment.setUser(actor);
         comment.setContent(request.getContent());
 
         Comment saved = commentRepository.save(comment);
+        if (actor.getId().equals(receiver.getId())){
+            return mapToDTO(saved); 
+        }
+                    notificationService.createNotification(
+            receiver,
+            actor,
+            NotificationType.COMMENT
+        );
 
         return mapToDTO(saved);
     }

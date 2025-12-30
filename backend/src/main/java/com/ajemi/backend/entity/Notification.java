@@ -1,25 +1,47 @@
 package com.ajemi.backend.entity;
-import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 
 @Entity
 @Table(name = "notifications")
+@Getter @Setter
 public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String message;
-    private boolean isRead = false;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    // 👤 لي غادي توصّلو notification
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // 👤 لي دار الفعل (follow / like / comment)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "actor_id", nullable = false)
+    private User actor;
+
+    // 🧾 نوع الإشعار
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+private NotificationType type;
+
+    // 👁️ تقرات ولا لا
+   @Column(name = "is_read", nullable = false) // Beddelna smiya f MySQL l- "is_read"
+    private boolean read = false;
+
+    // ⏰ وقت الإنشاء
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    public Notification() {}
-
-    // getters et setters
+    
+public enum NotificationType {
+    FOLLOW,
+    LIKE,
+    COMMENT,
+    POST,
+}
 }

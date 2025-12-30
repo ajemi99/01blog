@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.ajemi.backend.security.UserDetailsImpl;
 import com.ajemi.backend.dto.PostResponseDTO;
+
 import com.ajemi.backend.service.PostService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +34,7 @@ import lombok.RequiredArgsConstructor;
         // ===============================
         @PostMapping(consumes = "multipart/form-data")
         public ResponseEntity<?> createPost(
-                Authentication auth,
+                @AuthenticationPrincipal UserDetailsImpl userDetails,
                 @RequestPart(required = false) String description,
                 @RequestPart(required = false) MultipartFile file
         ) {
@@ -41,10 +43,7 @@ import lombok.RequiredArgsConstructor;
 
             return ResponseEntity.badRequest().body("Post cannot be empty!");
         }
-            // 1️⃣ Get username from JWT token
-            String username = auth.getName();
-
-            // 2️⃣ Call service to create post
+            String username = userDetails.getUsername(); // أو userDetails.getId() إذا بغيت
             PostResponseDTO dto = postService.createPost(username, description, file);
 
             // 3️⃣ Return the DTO as response

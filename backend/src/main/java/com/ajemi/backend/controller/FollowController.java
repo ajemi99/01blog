@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ajemi.backend.service.FollowService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.ajemi.backend.security.UserDetailsImpl;
 
 @RestController
 @RequestMapping("/api/follow")
@@ -16,20 +18,21 @@ public class FollowController {
 
      @PostMapping
     public void follow(
-        @RequestParam Long followerId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam Long followingId
     ) {
+        Long followerId = userDetails.getId();
         followService.follow(followerId, followingId);
     }
-
+    
+    
     @DeleteMapping
     public void unfollow(
-        @RequestParam Long followerId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam Long followingId
     ) {
+         Long followerId = userDetails.getId();
         followService.unfollow(followerId, followingId);
     }
-
-    
 
 }

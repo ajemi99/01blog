@@ -5,6 +5,7 @@ import com.ajemi.backend.entity.Subscription;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import com.ajemi.backend.entity.User;
 
 public interface FollowRepository extends JpaRepository<Subscription, Long>{
     boolean existsByFollowerIdAndFollowingId(Long followerId, Long followingId);
@@ -15,4 +16,7 @@ public interface FollowRepository extends JpaRepository<Subscription, Long>{
         WHERE s.follower.id = :currentUserId
     """)
     List<Long> findFollowingIds(@Param("currentUserId") Long currentUserId);
+    
+    @Query("SELECT s.follower FROM Subscription s WHERE s.following = :user")
+    List<User> findFollowersByUser(@Param("user") User user);
 }

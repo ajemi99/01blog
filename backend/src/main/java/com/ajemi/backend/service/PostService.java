@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.ajemi.backend.entity.Role;
 import com.ajemi.backend.dto.PostResponseDTO;
+import com.ajemi.backend.entity.Notification.NotificationType;
 import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.PostRepository;
@@ -26,15 +27,14 @@ public class PostService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
     private final FollowRepository followRepository;
-
+    private final NotificationService notificationService;
     // ===============================
     // Create a new post
     // ===============================
     @Transactional
     public PostResponseDTO createPost(String username, String description, MultipartFile file) {
-
         // 1️⃣ Get user from DB
-        User user = userRepository.findByUsername(username)
+        User actor = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // 2️⃣ Store media file (image/video)
@@ -42,12 +42,16 @@ public class PostService {
 
         // 3️⃣ Create Post object
         Post post = new Post();
-        post.setAuthor(user);
+        post.setAuthor(actor);
         post.setDescription(description);
         post.setMediaUrl(mediaUrl);
 
         // 4️⃣ Save Post in DB
         Post saved = postRepository.save(post);
+        List<User> followers = followRepository.findFollowersByUser(actor);
+         for (User follower : followers) {
+             notificationService.createNotification(follower, actor, NotificationType.POST);
+        }
 
         // 5️⃣ Map Entity → DTO
         return mapToDTO(saved,username);
