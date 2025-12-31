@@ -3,7 +3,7 @@ package com.ajemi.backend.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.lang.NonNull;
 import com.ajemi.backend.repository.FollowRepository;
 import com.ajemi.backend.repository.UserRepository;
 import com.ajemi.backend.entity.User;
@@ -36,7 +36,7 @@ public class FollowService {
         }
         
         User follower = userRepository.findById(followerId).orElseThrow();
-        User following = userRepository.findById(followingId).orElseThrow();
+        User following = userRepository.findById(@NonNull followingId).orElseThrow();
         
         Subscription follow = new Subscription();
         follow.setFollower(follower);

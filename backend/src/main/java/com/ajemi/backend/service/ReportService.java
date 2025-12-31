@@ -8,6 +8,7 @@ import com.ajemi.backend.entity.User;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
+import org.springframework.lang.NonNull;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class ReportService {
         User reporter = userRepository.findByUsername(reporterUsername)
                 .orElseThrow(() -> new RuntimeException("Reporter not found"));
 
-        User reported = userRepository.findById(reportedUserId)
+        User reported = userRepository.findById(@NonNull reportedUserId)
                 .orElseThrow(() -> new RuntimeException("Reported user not found"));
 
         // 🛑 ما يمكنش report راسك
@@ -42,9 +43,7 @@ public class ReportService {
                     r.getId(),
                     r.getReason(),
                     r.getReporter().getUsername(),
-                    r.getReporter().getId(),
                     r.getReportedUser().getUsername(),
-                    r.getReportedUser().getId(),
                     r.getCreatedAt()
             ))
             .toList();

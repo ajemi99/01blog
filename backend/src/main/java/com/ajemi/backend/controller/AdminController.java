@@ -1,6 +1,8 @@
 package com.ajemi.backend.controller;
 
 import java.util.List;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.ajemi.backend.security.UserDetailsImpl;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ajemi.backend.dto.AdminReportResponseDTO;
 import com.ajemi.backend.dto.PostResponseDTO;
-import com.ajemi.backend.entity.Report;
 import com.ajemi.backend.service.PostService;
 import com.ajemi.backend.service.ReportService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class AdminController {
     return postService.getAllPostsForAdmin(username);
     }
     @GetMapping("/reports")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<AdminReportResponseDTO>getAllReports() {
         return reportService.getAllReports();
     }

@@ -2,7 +2,7 @@ package com.ajemi.backend.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.ajemi.backend.dto.CommentRequestDTO;
@@ -28,7 +28,7 @@ public class CommentService {
 
     public CommentResponseDTO addComment(Long userId, CommentRequestDTO request) {
         
-        Post post = postRepository.findById(request.getPostId())
+        Post post = postRepository.findById(@NonNull request.getPostId())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         User actor = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -67,7 +67,7 @@ public class CommentService {
         return dto;
     }
 public void deleteComment(Long commentId, Long userId) {
-    Comment comment = commentRepository.findById(commentId)
+    Comment comment = commentRepository.findById(@NonNull commentId)
             .orElseThrow(() -> new RuntimeException("التعليق غير موجود"));
 
     if (comment.getUser() == null) {

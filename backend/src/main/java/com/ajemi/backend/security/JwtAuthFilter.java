@@ -18,8 +18,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
 
-import com.ajemi.backend.security.JwtService;
-import com.ajemi.backend.security.CustomUserDetailsService;
 
 
 @Component

@@ -16,7 +16,7 @@ import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.PostRepository;
 import com.ajemi.backend.repository.UserRepository;
 import com.ajemi.backend.repository.FollowRepository;
-
+import org.springframework.lang.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -108,7 +108,7 @@ public List<PostResponseDTO> getAllPostsForAdmin(String adminUsername) {
 @Transactional
     public void deletePost(Long id, String username) {
 
-    Post post = postRepository.findById(id)
+    Post post = postRepository.findById(@NonNull id)
             .orElseThrow(() -> new RuntimeException("Post not found"));
          if (!post.getAuthor().getUsername().equals(username)) {
             throw new RuntimeException("Unauthorized");
@@ -126,7 +126,7 @@ public List<PostResponseDTO> getAllPostsForAdmin(String adminUsername) {
 public PostResponseDTO updatePost(Long id, String username,  String newDescription, MultipartFile newFile) {
 
     // 1️⃣ جيب البوست من DB
-    Post post = postRepository.findById(id)
+    Post post = postRepository.findById(@NonNull id)
             .orElseThrow(() -> new RuntimeException("Post not found"));
 
         if (!post.getAuthor().getUsername().equals(username)) {

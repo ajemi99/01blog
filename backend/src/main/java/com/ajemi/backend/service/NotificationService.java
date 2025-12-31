@@ -4,7 +4,7 @@ import com.ajemi.backend.entity.Notification.NotificationType;
 import com.ajemi.backend.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import org.springframework.lang.NonNull;
 import com.ajemi.backend.dto.NotificationResponseDTO;
 import com.ajemi.backend.entity.Notification;
 import com.ajemi.backend.entity.User;
@@ -53,7 +53,7 @@ public class NotificationService {
     @Transactional
     public void markAsRead(Long notificationId, User user) {
 
-        Notification notification = notificationRepository.findById(notificationId)
+        Notification notification = notificationRepository.findById(@NonNull notificationId)
                 .orElseThrow(() -> new RuntimeException("Notification not found"));
 
         // 🛑 ماشي ديالك
