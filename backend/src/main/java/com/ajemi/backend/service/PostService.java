@@ -4,19 +4,21 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import com.ajemi.backend.entity.Role;
+
 import com.ajemi.backend.dto.PostResponseDTO;
 import com.ajemi.backend.entity.Notification.NotificationType;
 import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.User;
+import com.ajemi.backend.repository.FollowRepository;
 import com.ajemi.backend.repository.PostRepository;
 import com.ajemi.backend.repository.UserRepository;
-import com.ajemi.backend.repository.FollowRepository;
-import org.springframework.lang.NonNull;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -60,31 +62,25 @@ public class PostService {
     // ===============================
     // Get all posts (feed)
     // ===============================
-@Transactional(readOnly = true)
-public List<PostResponseDTO> getAllPostsForAdmin(String adminUsername) {
-    try {
-       User admin = userRepository.findByUsername(adminUsername)
-        .orElseThrow(() -> new RuntimeException("User not found"));
+// @Transactional(readOnly = true)
+// public List<PostResponseDTO> getAllPostsForAdmin(String adminUsername) {
+//     // 1️⃣ Get admin user from DB
+//     User admin = userRepository.findByUsername(adminUsername)
+//             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (admin.getRole() == null || admin.getRole().getName() != Role.RoleName.ADMIN) {
-            throw new RuntimeException("Forbidden");
-        }
+//     // 2️⃣ Get all posts ordered by creation date
+//     return postRepository.findAllByOrderByCreatedAtDesc()
+//             .stream()
+//             .map(post -> mapToDTO(post, adminUsername))
+//             .toList();
+// }
 
-        return postRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(post -> mapToDTO(post, adminUsername))
-                .toList();
-    } catch (Exception e) {
-        e.printStackTrace(); // هنا غادي تشوف الخطأ فـ console ديال Spring
-        throw e;
-    }
-}
 
 
     // ===============================
     // Convert Post entity to DTO
     // ===============================
-   private PostResponseDTO mapToDTO(Post post, String currentUsername) {
+   public PostResponseDTO mapToDTO(Post post, String currentUsername) {
     PostResponseDTO dto = new PostResponseDTO();
     dto.setId(post.getId());
     dto.setDescription(post.getDescription());
@@ -106,9 +102,9 @@ public List<PostResponseDTO> getAllPostsForAdmin(String adminUsername) {
 }
     
 @Transactional
-    public void deletePost(Long id, String username) {
+    public void deletePost(@NonNull Long id, String username) {
 
-    Post post = postRepository.findById(@NonNull id)
+    Post post = postRepository.findById( id)
             .orElseThrow(() -> new RuntimeException("Post not found"));
          if (!post.getAuthor().getUsername().equals(username)) {
             throw new RuntimeException("Unauthorized");
@@ -123,10 +119,10 @@ public List<PostResponseDTO> getAllPostsForAdmin(String adminUsername) {
 // Update Post (description + optional file)
 // ===============================
 @Transactional
-public PostResponseDTO updatePost(Long id, String username,  String newDescription, MultipartFile newFile) {
+public PostResponseDTO updatePost(@NonNull Long id, String username,  String newDescription, MultipartFile newFile) {
 
     // 1️⃣ جيب البوست من DB
-    Post post = postRepository.findById(@NonNull id)
+    Post post = postRepository.findById( id)
             .orElseThrow(() -> new RuntimeException("Post not found"));
 
         if (!post.getAuthor().getUsername().equals(username)) {
@@ -191,68 +187,3 @@ public List<PostResponseDTO> getFeed(Authentication authentication) {
 
 }
 
-
-
-
-
-// package com.ajemi.backend.service;
-
-// import com.ajemi.backend.entity.Post;
-// import com.ajemi.backend.entity.User;
-// // import com.ajemi.backend.entity.Role.RoleName;
-// import com.ajemi.backend.repository.PostRepository;
-// import com.ajemi.backend.repository.UserRepository;
-
-// import org.springframework.stereotype.Service;
-
-// import java.util.List;
-
-// import com.ajemi.backend.entity.Role;
-
-// @Service
-// public class PostService {
-//     private final PostRepository postRepository;
-//     private final UserRepository userRepository;
-
-//     public PostService(PostRepository postRepository, UserRepository userRepository) {
-//         this.postRepository = postRepository;
-//         this.userRepository = userRepository;
-//     }
-
-//     // 🟢 Ajouter un post
-//     public Post createPost(String username, String content, String mediaUrl) {
-//         User user = userRepository.findByUsername(username)
-//                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-
-//         Post post = new Post();
-//         post.setUser(user);
-//         post.setContent(content);
-//         post.setMediaUrl(mediaUrl);
-
-//         return postRepository.save(post);
-//     }
-
-//     // 🟡 Récupérer tous les posts
-//     public List<Post> getAllPosts() {
-//         return postRepository.findAll();
-//     }
-
-//     // 🔴 Supprimer un post par ID
-//     public void deletePost(Long id, String username) {
-//         Post post = postRepository.findById(id)
-//             .orElseThrow(() -> new RuntimeException("Post introuvable"));
-
-//     User user = userRepository.findByUsername(username)
-//             .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
-
-//     // ✅ Vérifier si le user est le créateur OU admin
-//     boolean isOwner = post.getUser().getUsername().equals(username);
-//     boolean isAdmin = user.getRole().getName() == Role.RoleName.ADMIN;
-
-//     if (!isOwner && !isAdmin) {
-//         throw new RuntimeException("❌ Vous n'avez pas la permission de supprimer ce post !");
-//     }
-
-//     postRepository.delete(post);
-//     }
-// }

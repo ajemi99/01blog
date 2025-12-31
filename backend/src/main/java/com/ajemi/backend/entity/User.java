@@ -81,6 +81,8 @@ public class User {
     @OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Report> reportsReceived = new ArrayList<>();
     
+    @Column(nullable = false)
+    private boolean banned = false;
 
     // 🧱 Constructeurs, getters, setters
     public User() {}

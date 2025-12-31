@@ -10,5 +10,7 @@ import com.ajemi.backend.entity.User;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
     List<Notification> findByUserOrderByCreatedAtDesc(User user);
+    void deleteAllByActor(User actor);
+    void deleteAllByUser(User user);
 }
 

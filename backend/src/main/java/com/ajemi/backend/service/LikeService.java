@@ -1,7 +1,8 @@
 package com.ajemi.backend.service;
 
-import org.springframework.stereotype.Service;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+
 import com.ajemi.backend.entity.Like;
 import com.ajemi.backend.entity.Notification.NotificationType;
 import com.ajemi.backend.entity.Post;
@@ -21,7 +22,7 @@ public class LikeService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
 
-    public String toggleLike(Long postId, String username) {
+    public String toggleLike(@NonNull Long postId, String username) {
 
         // 1) نجيبو البوست
         Post post = postRepository.findById(postId)
@@ -36,7 +37,7 @@ public class LikeService {
 
         if (existing.isPresent()) {
             // --- كان دير like → نديرو UNLIKE
-            likeRepository.delete(@NonNull existing.get());
+            likeRepository.delete(existing.get());
             return "unliked";
         }
         if (actor.getId().equals(receiver.getId())) {
@@ -56,8 +57,8 @@ public class LikeService {
         return "liked";
     }
 
-    public int getLikesCount(Long postId) {
-        Post post = postRepository.findById(@NonNull postId)
+    public int getLikesCount(@NonNull Long postId) {
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
         return likeRepository.countByPost(post);

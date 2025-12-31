@@ -64,9 +64,9 @@ loadPosts() {
   }
 
   let url = "http://localhost:8080/api/posts/feed"; // default user feed
-  if (this.roles && this.roles.includes("ADMIN")) {
-    url = "http://localhost:8080/api/admin/posts"; // admin sees all
-  }
+  // if (this.roles && this.roles.includes("ADMIN")) {
+  //   url = "http://localhost:8080/api/admin/posts"; // admin sees all
+  // }
 
   this.http.get(url).subscribe({
     next: (data: any) => {

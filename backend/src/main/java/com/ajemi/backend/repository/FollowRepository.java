@@ -19,4 +19,5 @@ public interface FollowRepository extends JpaRepository<Subscription, Long>{
     
     @Query("SELECT s.follower FROM Subscription s WHERE s.following = :user")
     List<User> findFollowersByUser(@Param("user") User user);
+    void deleteAllByFollowerOrFollowing(User follower, User following);
 }

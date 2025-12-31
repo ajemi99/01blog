@@ -31,7 +31,6 @@ public class ReportController {
         request.getUserId(),
         request.getReason()
     );
-
     return ResponseEntity.ok("Report sent");
 }
 }

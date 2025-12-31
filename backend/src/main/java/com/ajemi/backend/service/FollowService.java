@@ -1,17 +1,18 @@
 package com.ajemi.backend.service;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.lang.NonNull;
-import com.ajemi.backend.repository.FollowRepository;
-import com.ajemi.backend.repository.UserRepository;
-import com.ajemi.backend.entity.User;
-import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ajemi.backend.entity.Notification.NotificationType;
 import com.ajemi.backend.entity.Subscription;
-import org.springframework.transaction.annotation.Transactional;
+import com.ajemi.backend.entity.User;
+import com.ajemi.backend.repository.FollowRepository;
+import com.ajemi.backend.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class FollowService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
 
-    public void follow(Long followerId, Long followingId) {
+    public void follow(@NonNull Long followerId,@NonNull Long followingId) {
         if (followerId.equals(followingId)) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST, "You cannot follow yourself"
@@ -36,7 +37,7 @@ public class FollowService {
         }
         
         User follower = userRepository.findById(followerId).orElseThrow();
-        User following = userRepository.findById(@NonNull followingId).orElseThrow();
+        User following = userRepository.findById( followingId).orElseThrow();
         
         Subscription follow = new Subscription();
         follow.setFollower(follower);

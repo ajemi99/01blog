@@ -24,6 +24,11 @@ public class Report {
     @JoinColumn(name = "reported_user_id")
     private User reportedUser;
 
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = true)
+    private Post post;
+
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public Report() {}

@@ -1,15 +1,18 @@
 package com.ajemi.backend.service;
 
-import com.ajemi.backend.entity.Notification.NotificationType;
-import com.ajemi.backend.repository.NotificationRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import java.util.List;
+
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ajemi.backend.dto.NotificationResponseDTO;
 import com.ajemi.backend.entity.Notification;
+import com.ajemi.backend.entity.Notification.NotificationType;
 import com.ajemi.backend.entity.User;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
+import com.ajemi.backend.repository.NotificationRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -51,9 +54,9 @@ public class NotificationService {
 
         // ✅ علّم notification كمقروءة
     @Transactional
-    public void markAsRead(Long notificationId, User user) {
+    public void markAsRead(@NonNull Long notificationId, User user) {
 
-        Notification notification = notificationRepository.findById(@NonNull notificationId)
+        Notification notification = notificationRepository.findById( notificationId)
                 .orElseThrow(() -> new RuntimeException("Notification not found"));
 
         // 🛑 ماشي ديالك
@@ -65,15 +68,11 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
     public String buildMessage(Notification notification) {
-    switch(notification.getType()) {
-        case FOLLOW:
-            return notification.getActor().getUsername() + " started following you";
-        case LIKE:
-            return notification.getActor().getUsername() + " liked your post";
-        case COMMENT:
-            return notification.getActor().getUsername() + " commented on your post";
-        default:
-            return "You have a new notification";
-    }
+      return switch (notification.getType()) {
+          case FOLLOW -> notification.getActor().getUsername() + " started following you";
+          case LIKE -> notification.getActor().getUsername() + " liked your post";
+          case COMMENT -> notification.getActor().getUsername() + " commented on your post";
+          default -> "You have a new notification";
+      };
     }
 }

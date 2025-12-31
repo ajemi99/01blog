@@ -45,14 +45,13 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}/user/{userId}")
-public ResponseEntity<?> deleteComment(
+    public ResponseEntity<?> deleteComment(
         @PathVariable Long commentId,
         @PathVariable Long userId
-) {
-    commentService.deleteComment(commentId, userId);
-    return ResponseEntity.ok(Map.of("message", "Commentaire supprimé"));
-
-}
+    ) {
+        commentService.deleteComment(commentId, userId);
+        return ResponseEntity.ok(Map.of("message", "Commentaire supprimé"));
+    }
 
 }
 

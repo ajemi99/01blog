@@ -1,14 +1,17 @@
 package com.ajemi.backend.service;
 
+import java.util.List;
+
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+
 import com.ajemi.backend.dto.AdminReportResponseDTO;
 import com.ajemi.backend.entity.Report;
+import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.ReportRepository;
 import com.ajemi.backend.repository.UserRepository;
-import com.ajemi.backend.entity.User;
-import org.springframework.stereotype.Service;
+
 import lombok.RequiredArgsConstructor;
-import java.util.List;
-import org.springframework.lang.NonNull;
 
 @Service
 @RequiredArgsConstructor
@@ -16,12 +19,12 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
 
-     public void reportUser(String reporterUsername, Long reportedUserId, String reason) {
+     public void reportUser(String reporterUsername, @NonNull Long reportedUserId, String reason) {
 
         User reporter = userRepository.findByUsername(reporterUsername)
                 .orElseThrow(() -> new RuntimeException("Reporter not found"));
 
-        User reported = userRepository.findById(@NonNull reportedUserId)
+        User reported = userRepository.findById( reportedUserId)
                 .orElseThrow(() -> new RuntimeException("Reported user not found"));
 
         // 🛑 ما يمكنش report راسك

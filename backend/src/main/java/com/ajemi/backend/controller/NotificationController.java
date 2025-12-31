@@ -1,16 +1,20 @@
 package com.ajemi.backend.controller;
 
 import java.util.List;
-import org.springframework.lang.NonNull;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.ajemi.backend.dto.NotificationResponseDTO;
-
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.UserRepository;
 import com.ajemi.backend.security.UserDetailsImpl;
 import com.ajemi.backend.service.NotificationService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,7 +29,7 @@ public class NotificationController {
 @GetMapping
 public List<NotificationResponseDTO> getMyNotifications(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    User user = userRepository.findById( @NonNull userDetails.getId())
+    User user = userRepository.findById(userDetails.getId())
             .orElseThrow(() -> new RuntimeException("User not found"));
 
     return notificationService.getUserNotifications(user);
@@ -37,7 +41,7 @@ public List<NotificationResponseDTO> getMyNotifications(@AuthenticationPrincipal
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        User user = userRepository.findById(@NonNull userDetails.getId())
+        User user = userRepository.findById( userDetails.getId())
             .orElseThrow(() -> new RuntimeException("User not found"));
 
         notificationService.markAsRead(id, user);

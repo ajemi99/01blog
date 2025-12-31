@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.ajemi.backend.entity.Post;
+import com.ajemi.backend.entity.User;
 
 // import com.ajemi.backend.entity.User;
 
@@ -14,6 +15,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByOrderByCreatedAtDesc();
     List<Post> findByAuthor_IdOrderByCreatedAtDesc(Long authorId);
     List<Post> findAllByAuthor_IdInOrderByCreatedAtDesc(List<Long> authorIds);
+    void deleteAllByAuthor(User author);
 }
 
 
