@@ -58,7 +58,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**", "/api/test").permitAll()
             .requestMatchers("/uploads/**").permitAll()
-            .requestMatchers("/api/posts/admin").hasRole("ADMIN")
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .anyRequest().authenticated()
         )
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
