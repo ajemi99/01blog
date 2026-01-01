@@ -33,16 +33,16 @@ public class LikeService {
             .orElseThrow(() -> new RuntimeException("User not found"));
         User receiver = post.getAuthor();
         // 3) نشوفو واش دار like قبل
-        var existing = likeRepository.findByPostAndUser(post, actor);
+        var  existing = likeRepository.findByPostAndUser(post, actor);
 
         if (existing.isPresent()) {
             // --- كان دير like → نديرو UNLIKE
             likeRepository.delete(existing.get());
             return "unliked";
         }
-        if (actor.getId().equals(receiver.getId())) {
-            return "liked"; // أو return بلا notification
-        }
+        // if (actor.getId().equals(receiver.getId())) {
+        //     return "liked"; // أو return بلا notification
+        // }
         // --- ما دارش like → نديرو LIKE
         Like like = new Like();
         like.setPost(post);

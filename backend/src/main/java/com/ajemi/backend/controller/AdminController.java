@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.ajemi.backend.dto.AdminReportResponseDTO;
 import com.ajemi.backend.dto.PostDTO;
 import com.ajemi.backend.dto.UserDTO;
 import com.ajemi.backend.service.AdminService;
 import com.ajemi.backend.service.ReportService;
+
 import lombok.RequiredArgsConstructor;
 
  @RestController
@@ -54,6 +56,17 @@ public class AdminController {
     @PostMapping("/reports/{id}/action")
     public ResponseEntity<Void> takeActionOnReport(@PathVariable Long id, @RequestParam String action) {
         adminService.handleReport(id, action);
+        return ResponseEntity.ok().build();
+    }
+    //---------------------ban/unban---------------------------------------------------------------------
+    @PostMapping("/users/{id}/ban")
+    public ResponseEntity<Void> banUser(@PathVariable Long id) {
+        adminService.banUser(id);
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping("/users/{id}/unban")
+    public ResponseEntity<Void> unbanUser(@PathVariable Long id) {
+         adminService.unbanUser(id);
         return ResponseEntity.ok().build();
     }
 }

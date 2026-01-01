@@ -106,11 +106,11 @@ public class PostService {
 
     Post post = postRepository.findById( id)
             .orElseThrow(() -> new RuntimeException("Post not found"));
-         if (!post.getAuthor().getUsername().equals(username)) {
+        if (!post.getAuthor().getUsername().equals(username)) {
             throw new RuntimeException("Unauthorized");
         }
     // احذف الملف إذا كان موجود
-        deleteFile(post.getMediaUrl());
+        fileStorageService.deleteFile(post.getMediaUrl());
 
     // حذف البوست من قاعدة البيانات
     postRepository.delete(post);
@@ -137,7 +137,7 @@ public PostResponseDTO updatePost(@NonNull Long id, String username,  String new
     if (newFile != null && !newFile.isEmpty()) {
 
         // 🗑️ مسح الصورة القديمة إلا كانت موجودة
-        deleteFile(post.getMediaUrl());
+        fileStorageService.deleteFile(post.getMediaUrl());
 
         // 💾 حفظ الصورة الجديدة
         String newMediaUrl = fileStorageService.saveFile(newFile);
@@ -152,12 +152,8 @@ public PostResponseDTO updatePost(@NonNull Long id, String username,  String new
 
     return mapToDTO(updated,username);
 }
-private void deleteFile(String mediaUrl) {
-    if (mediaUrl != null) {
-        File file = new File("." + mediaUrl);
-        if (file.exists()) file.delete();
-    }
-}
+
+
 @Transactional(readOnly = true)
 public List<PostResponseDTO> getMyPosts(Long authorId, String username) {
     List<Post> posts = postRepository.findByAuthor_IdOrderByCreatedAtDesc(authorId);

@@ -2,7 +2,7 @@ package com.ajemi.backend.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.ajemi.backend.security.UserDetailsImpl;
-
+import org.springframework.web.bind.annotation.PathVariable;
 import lombok.RequiredArgsConstructor;
 import com.ajemi.backend.dto.ReportRequest;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +19,17 @@ import jakarta.validation.Valid;
 public class ReportController {
     private final ReportService reportService;
 
-    @PostMapping("/reports")
+    @PostMapping("/reports/{postId}")
     public ResponseEntity<?> reportUser(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @Valid @RequestBody ReportRequest request
+        @Valid @RequestBody ReportRequest request,
+        @PathVariable Long postId
 ) {
     
     String username = userDetails.getUsername();
-    reportService.reportUser(
+    reportService.reportPost(
         username,
-        request.getUserId(),
+        postId,
         request.getReason()
     );
     return ResponseEntity.ok("Report sent");

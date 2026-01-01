@@ -44,6 +44,8 @@ toggleLike(post: Post) {
 
   this.likeService.toggleLike(post.id).subscribe(
     res => {
+      console.log(res);
+      
       if (res.message === 'liked') {
         post.liked = true;
         post.likesCount++;
@@ -61,11 +63,11 @@ toggleLike(post: Post) {
 }
 
 
-// getLikesCount(post: Post) {
-//   this.likeService.getLikesCount(post.id).subscribe(res => {
-//     post.likesCount = res.likesCount;
-//   });
-// }
+getLikesCount(post: Post) {
+  this.likeService.getLikesCount(post.id).subscribe(res => {
+    post.likesCount = res.likesCount;
+  });
+}
 
   
 

@@ -48,4 +48,19 @@ public class FileStorageService {
             throw new RuntimeException("Could not store the file!", e);
         }
     }
+    public void deleteFile(String mediaUrl) {
+    if (mediaUrl == null || mediaUrl.isBlank()) return;
+
+    try {
+        // mediaUrl = /uploads/xxxx.jpg
+        String filename = mediaUrl.replace("/uploads/", "");
+
+        Path filePath = root.resolve(filename).normalize();
+        Files.deleteIfExists(filePath);
+
+    } catch (IOException e) {
+        System.err.println("Could not delete file: " + mediaUrl);
+    }
+    }
+
 }

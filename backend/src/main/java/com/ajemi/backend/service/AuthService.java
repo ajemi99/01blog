@@ -1,16 +1,15 @@
 package com.ajemi.backend.service;
 
 
-import com.ajemi.backend.entity.User;
-import com.ajemi.backend.repository.UserRepository;
-import com.ajemi.backend.security.JwtService;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ajemi.backend.entity.Role;
+import com.ajemi.backend.entity.User;
 import com.ajemi.backend.exception.ApiException;
 import com.ajemi.backend.repository.RoleRepository;
+import com.ajemi.backend.repository.UserRepository;
+import com.ajemi.backend.security.JwtService;
 
 
 @Service
@@ -61,6 +60,10 @@ public class AuthService {
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new ApiException("Invalid credentials");
         }
+        if(user.isBanned()){
+            throw new ApiException("you are banned");
+        }
+        
 
         return jwtService.generateTokenWithRoles(user.getUsername(), user.getRole());
     }

@@ -19,7 +19,7 @@ export class LikeService {
   }
 
   // 🔢 Get likes count
-  // getLikesCount(postId: number) {
-  //   return this.http.get<{ likesCount: number }>(`${this.apiUrl}/${postId}`);
-  // }
+  getLikesCount(postId: number) {
+    return this.http.get<{ likesCount: number }>(`${this.apiUrl}/${postId}`);
+  }
 }

@@ -2,22 +2,19 @@ package com.ajemi.backend.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ajemi.backend.dto.PostDTO;
 import com.ajemi.backend.dto.UserDTO;
+import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.Report;
 import com.ajemi.backend.entity.User;
-import com.ajemi.backend.repository.UserRepository;
-import com.ajemi.backend.repository.CommentRepository;
-import com.ajemi.backend.repository.LikeRepository;
+import com.ajemi.backend.repository.FollowRepository;
 import com.ajemi.backend.repository.NotificationRepository;
 import com.ajemi.backend.repository.PostRepository;
-
-
-import org.springframework.stereotype.Service;
-
-import org.springframework.transaction.annotation.Transactional;
-import com.ajemi.backend.repository.FollowRepository;
 import com.ajemi.backend.repository.ReportRepository;
+import com.ajemi.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 @Service
@@ -26,10 +23,9 @@ public class AdminService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final ReportRepository reportRepository;
-    private final CommentRepository commentRepository;
-    private final LikeRepository likeRepository;
     private final FollowRepository  subscriptionRepository;
     private final NotificationRepository notificationRepository;
+    private final FileStorageService fileStorageService;
 
     // ---------------- USERS ----------------------------------------------------------------------
         public List<UserDTO> getAllUsers() {
@@ -48,10 +44,10 @@ public class AdminService {
         notificationRepository.deleteAllByUser(user);
 
         // 2️⃣ Delete likes made by user
-        likeRepository.deleteAllByUser(user);
+        // likeRepository.deleteAllByUser(user);
 
-        // 3️⃣ Delete comments made by user
-        commentRepository.deleteAllByUser(user);
+        // // 3️⃣ Delete comments made by user
+        // commentRepository.deleteAllByUser(user);
 
         // 4️⃣ Delete subscriptions (follower or followed)
         subscriptionRepository.deleteAllByFollowerOrFollowing(user, user);
@@ -60,7 +56,11 @@ public class AdminService {
         reportRepository.deleteAllByReporterOrReportedUser(user, user);
 
         // 6️⃣ Delete posts (cascade will remove comments and likes)
-        postRepository.deleteAllByAuthor(user);
+        List<Post> posts = postRepository.findAllByAuthor(user);
+        for(Post post:posts){
+            fileStorageService.deleteFile(post.getMediaUrl());
+        }
+        postRepository.deleteAll(posts);
 
         // 7️⃣ Finally, delete user
         userRepository.delete(user);
@@ -72,33 +72,64 @@ public class AdminService {
                 .map(PostDTO::new)
                 .toList();
         }
-
+        @Transactional
          public void deletePost(Long postId) {
-             postRepository.deleteById(postId);
+            Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new RuntimeException("المنشور غير موجود بالمعرّف: " + postId));
+
+         if (post.getMediaUrl() != null) {
+             fileStorageService.deleteFile(post.getMediaUrl());
+        }
+        reportRepository.deleteByPostId(postId);
+            postRepository.deleteById(postId);
         }
 
  // ---------------- REPORTS ------------------------------------------------------------------------
-        public void handleReport(Long reportId, String action) {
-        Report report = reportRepository.findById(reportId)
+       @Transactional
+ public void handleReport(Long reportId, String action) {
+        Report report = reportRepository.findById(reportId) 
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
+                if(report.getPost() == null) {
+                    throw new RuntimeException("Report has no post to delete");
+                }
         switch (action.toLowerCase()) {
             case "delete_post" -> {
                 if (report.getPost() != null) {
-                    postRepository.delete(report.getPost());
+                    deletePost(report.getPost().getId());
                 }
             }
             case "ban_user" -> {
                 User user = report.getReportedUser();
+                if(user == null) {
+                    throw new RuntimeException("Reported user not found");
+                }
                 user.setBanned(true); // خاصك boolean banned ف User
             }
             case "delete_user" -> {
-                userRepository.delete(report.getReportedUser());
+                deleteUser(report.getReportedUser().getId());
             }
             default -> throw new RuntimeException("Unknown action");
         }
 
         reportRepository.delete(report); // نحيدو report من بعد المعالجة
     }
-    
+
+    //----------------------------------ban/unbann--------------------------------------------------
+    @Transactional
+    public void banUser(Long userId) {
+     User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+     user.setBanned(true);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void unbanUser(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setBanned(false);
+     userRepository.save(user);
+    }
+
 }

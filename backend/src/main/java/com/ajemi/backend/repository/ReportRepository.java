@@ -7,4 +7,5 @@ import com.ajemi.backend.entity.User;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
     void deleteAllByReporterOrReportedUser(User reporter, User reported);
+    void deleteByPostId(Long postId);
 }

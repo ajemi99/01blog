@@ -7,5 +7,6 @@ public record AdminReportResponseDTO(
         String reason,
         String reporterUsername,
         String reportedUsername,
+        Long postId,
         LocalDateTime createdAt
 ) {}

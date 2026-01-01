@@ -10,6 +10,8 @@ import com.ajemi.backend.entity.Report;
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.ReportRepository;
 import com.ajemi.backend.repository.UserRepository;
+import com.ajemi.backend.repository.PostRepository;
+import com.ajemi.backend.entity.Post;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,28 +20,32 @@ import lombok.RequiredArgsConstructor;
 public class ReportService {
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
-     public void reportUser(String reporterUsername, @NonNull Long reportedUserId, String reason) {
+     public void reportPost(String reporterUsername, @NonNull Long postId, String reason) {
 
         User reporter = userRepository.findByUsername(reporterUsername)
                 .orElseThrow(() -> new RuntimeException("Reporter not found"));
 
-        User reported = userRepository.findById( reportedUserId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Reported user not found"));
 
         // 🛑 ما يمكنش report راسك
-        if (reporter.getId().equals(reported.getId())) {
-            throw new RuntimeException("You cannot report yourself");
+        if (reporter.getId().equals(post.getAuthor().getId())) {
+                throw new RuntimeException("You cannot report yourself");
         }
 
         Report report = new Report();
         report.setReporter(reporter);
-        report.setReportedUser(reported);
+        report.setReportedUser(post.getAuthor());
         report.setReason(reason);
+        report.setPost(post);
+
 
         reportRepository.save(report);
     }
    public List<AdminReportResponseDTO> getAllReports() {
+        
     return reportRepository.findAll()
             .stream()
             .map(r -> new AdminReportResponseDTO(
@@ -47,6 +53,7 @@ public class ReportService {
                     r.getReason(),
                     r.getReporter().getUsername(),
                     r.getReportedUser().getUsername(),
+                    r.getPost() != null ? r.getPost().getId() : null,
                     r.getCreatedAt()
             ))
             .toList();

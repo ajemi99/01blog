@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotBlank;
 @NoArgsConstructor
 @Getter @Setter
 public class ReportRequest {
-    private Long userId;
     @NotBlank(message = "Reason is required")
     private String reason;
 }
