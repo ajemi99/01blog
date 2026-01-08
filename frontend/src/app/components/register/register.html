@@ -1,22 +1,61 @@
-<div class="auth-wrapper">
-      <div class="card">
-        <h2>Créer un compte</h2>
-        <form (ngSubmit)="doRegister()">
-          <label>Username</label>
-          <input class="input" placeholder="ex: demo" [(ngModel)]="username" name="username" required />
-
-          <label>Email</label>
-          <input class="input" placeholder="ex: demo@mail.com" [(ngModel)]="email" name="email" type="email" required />
-
-          <label>Mot de passe</label>
-          <input class="input" placeholder="Mot de passe" type="password" [(ngModel)]="password" name="password" required />
-
-          <button type="submit" class="btn primary"> Créer un compte</button>
-        </form>
-
-        <p class="muted">Déjà un compte ?
-          <a routerLink="/login" class="link">Se connecter</a>
-        </p>
-        <p class="status" [class.error]="isError">{{ message() }}</p>
+<div class="auth-container">
+  <div class="card register-card shadow-lg">
+    <div class="card-body p-4 p-md-5">
+      
+      <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary">Join 01Blog</h2>
+        <p class="text-muted">Start documenting your learning journey</p>
       </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger border-0 small text-center mb-4 py-2">
+        <i class="bi bi-exclamation-circle me-2"></i> {{ errorMessage }}
+      </div>
+
+      <form #registerForm="ngForm" (ngSubmit)="onRegister(registerForm)">
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Username</label>
+          <input type="text" name="username" ngModel required minlength="3" 
+                 class="form-control" #uInput="ngModel"
+                 placeholder="Choose a unique username">
+          <div *ngIf="uInput.invalid && uInput.touched" class="text-danger small mt-1">
+            <span *ngIf="uInput.errors?.['required']">Username is required.</span>
+            <span *ngIf="uInput.errors?.['minlength']">At least 3 characters.</span>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Email Address</label>
+          <input type="email" name="email" ngModel required email 
+                 class="form-control" #eInput="ngModel"
+                 placeholder="name@student.com">
+          <div *ngIf="eInput.invalid && eInput.touched" class="text-danger small mt-1">
+            Please enter a valid email address.
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Password</label>
+          <input type="password" name="password" ngModel required minlength="6" 
+                 class="form-control" #pInput="ngModel"
+                 placeholder="Create a strong password">
+          <div *ngIf="pInput.invalid && pInput.touched" class="text-danger small mt-1">
+            Password must be at least 6 characters.
+          </div>
+        </div>
+
+        <button type="submit" 
+                class="btn btn-primary w-100 btn-register mb-3 shadow-sm"
+                [disabled]="registerForm.invalid">
+          Create Account
+        </button>
+
+        <div class="text-center">
+          <span class="text-muted small">Already have an account? </span>
+          <a routerLink="/login" class="text-primary fw-bold text-decoration-none small">Login here</a>
+        </div>
+
+      </form>
     </div>
+  </div>
+</div>

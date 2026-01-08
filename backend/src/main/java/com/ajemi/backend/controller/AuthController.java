@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.ajemi.backend.dto.AuthResponseDTO;
 import com.ajemi.backend.dto.LoginRequestDTO;
 import com.ajemi.backend.dto.RegisterRequestDTO;
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.service.AuthService;
 import com.ajemi.backend.service.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,14 +33,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterRequestDTO body) {
-        String token = authService.register(body.username(), body.email(), body.password());
+    public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO body) {
+        String token = authService.register(body.getUsername(), body.getEmail(), body.getPassword());
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO body) {
-        String token = authService.login(body.usernameOrEmail(), body.password());
+        String token = authService.login(body.identifier(), body.password());
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 

@@ -1,19 +1,59 @@
-<div class="auth-wrapper">
-      <div class="card">
-        <h2>Connexion</h2>
-        <form (ngSubmit)="doLogin()">
-          <label>Username ou Email</label>
-          <input class="input" placeholder="ex: demo ou demo@mail.com" [(ngModel)]="usernameOrEmail" name="usernameOrEmail" required />
-
-          <label>Mot de passe</label>
-          <input class="input" placeholder="Votre mot de passe" type="password" [(ngModel)]="password" name="password" required />
-
-          <button type="submit" class="btn primary" >Se connecter</button>
-        </form>
-
-        <p class="muted">Pas de compte ?
-          <a routerLink="/register" class="link">Créer un compte</a>
-        </p>
-        <p class="status" [class.error]="isError">{{ message() }}</p>
+<div class="auth-container">
+  <div class="card login-card shadow-lg">
+    <div class="card-body p-4 p-md-5">
+      
+      <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary">Welcome Back</h2>
+        <p class="text-muted">Login to your 01Blog account</p>
       </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger border-0 small text-center mb-4 py-2">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
+      </div>
+
+      <form #loginForm="ngForm" (ngSubmit)="onLogin(loginForm)">
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Username or Email</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person"></i></span>
+            <input type="text" name="identifier" ngModel required 
+                   class="form-control border-start-0" #idInput="ngModel"
+                   placeholder="Enter username or email">
+          </div>
+          <div *ngIf="idInput.invalid && idInput.touched" class="text-danger small mt-1">
+            Please enter your credentials.
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="d-flex justify-content-between">
+            <label class="form-label fw-semibold">Password</label>
+            <a href="#" class="text-decoration-none small">Forgot?</a>
+          </div>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock"></i></span>
+            <input type="password" name="password" ngModel required 
+                   class="form-control border-start-0" #pInput="ngModel"
+                   placeholder="Enter password">
+          </div>
+          <div *ngIf="pInput.invalid && pInput.touched" class="text-danger small mt-1">
+            Password is required.
+          </div>
+        </div>
+
+        <button type="submit" 
+                class="btn btn-primary w-100 btn-login mb-3 shadow-sm"
+                [disabled]="loginForm.invalid">
+          Sign In
+        </button>
+
+        <div class="text-center">
+          <span class="text-muted small">New to 01Blog? </span>
+          <a routerLink="/register" class="text-primary fw-bold text-decoration-none small">Create Account</a>
+        </div>
+
+      </form>
     </div>
+  </div>
+</div>

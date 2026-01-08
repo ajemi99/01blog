@@ -1,14 +1,14 @@
 package com.ajemi.backend.exception;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -34,16 +34,16 @@ public class GlobalExceptionHandler {
     }
 
     // ✅ 2️⃣ Business logic errors
-    @ExceptionHandler(ApiException.class)
-    public ResponseEntity<Map<String, Object>> handleApiException(ApiException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of(
-                        "timestamp", LocalDateTime.now(),
-                        "status", 400,
-                        "message", ex.getMessage()
-                ));
-    }
+@ExceptionHandler(ApiException.class)
+public ResponseEntity<Map<String, Object>> handleApiException(ApiException ex) {
+    return ResponseEntity
+            .status(ex.getStatus()) // Hna ghadi i-sift l-status li khtariyti f l-Service
+            .body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", ex.getStatus().value(),
+                    "message", ex.getMessage()
+            ));
+}
 
     // ❌ 3️⃣ Any other error
     @ExceptionHandler(Exception.class)
@@ -56,5 +56,25 @@ public class GlobalExceptionHandler {
                         "message", "Erreur interne du serveur"
                 ));
     }
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+        public ResponseEntity<Map<String, Object>> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex) {
+         return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED) // 401
+            .body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 401,
+                    "message", "Identifiant ou mot de passe incorrect"
+            ));
+        }
+        @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+        public ResponseEntity<Map<String, Object>> handleMaxUploadSize(org.springframework.web.multipart.MaxUploadSizeExceededException ex) {
+        return ResponseEntity
+            .status(HttpStatus.PAYLOAD_TOO_LARGE) // 413
+            .body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 413,
+                    "message", "Le fichier est trop volumineux. La taille maximale est de 10MB."
+            ));
+        }
 }
 

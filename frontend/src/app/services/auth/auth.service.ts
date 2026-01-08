@@ -1,16 +1,15 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = 'http://localhost:8080/api/auth';
+  private readonly apiUrl = 'http://localhost:8080/api/auth';
   private readonly tokenKey = 'token';
+  private http = inject(HttpClient)
   currentUser: any = null;
 
-
-  constructor(private http: HttpClient) {
-    this.checkToken(); 
+  constructor() {
   }
 
   get token(): string | null {
@@ -21,15 +20,29 @@ export class AuthService {
     return !!this.token;
   }
 
-  async login(usernameOrEmail: string, password: string): Promise<void> {
-    const res = await firstValueFrom(this.http.post<{ token: string }>(`${this.baseUrl}/login`, { usernameOrEmail, password }));
-    localStorage.setItem(this.tokenKey, res.token);
+  // Function ديال الـ Login
+  login(credentials: any) {
+    return this.http.post(`${this.apiUrl}/login`, credentials);
+  }
+  //Function register
+  register(credentials:any){
+    return this.http.post(`${this.apiUrl}/register`, credentials)
   }
 
-  async register(username: string, email: string, password: string): Promise<void> {
-    const res = await firstValueFrom(this.http.post<{ token: string }>(`${this.baseUrl}/register`, { username, email, password }));
-    localStorage.setItem(this.tokenKey, res.token);
+  // Function باش نخبيو الـ JWT في المتصفح
+  saveToken(token: string) {
+    localStorage.setItem('token', token);
   }
+
+  // Function باش نعرفو واش الـ User متصل (غنحتاجوها من بعد)
+  getToken() {
+    return localStorage.getItem('token');
+  }
+
+  // async register(username: string, email: string, password: string): Promise<void> {
+  //   const res = await firstValueFrom(this.http.post<{ token: string }>(`${this.apiUrl}/register`, { username, email, password }));
+  //   localStorage.setItem(this.tokenKey, res.token);
+  // }
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
@@ -43,7 +56,7 @@ export class AuthService {
 
     try {
       // On envoie la requête vers le backend pour vérifier la validité du token
-      const user = await firstValueFrom(this.http.get<{ id: number; username: string }>(`${this.baseUrl}/me`));
+      const user = await firstValueFrom(this.http.get<{ id: number; username: string }>(`${this.apiUrl}/me`));
       this.currentUser = user;
       console.log("User", this.currentUser);
     } catch (err) {

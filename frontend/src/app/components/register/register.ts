@@ -1,42 +1,34 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
-import { Router, RouterLink } from '@angular/router';
+import { Router,RouterLink} from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-register',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule,RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
 export class Register {
-  username = '';
-  email = '';
-  password = '';
-  message = signal('');
-  isError = false;
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  errorMessage: string | null = null;
 
-  constructor(private auth: AuthService, private router: Router) {}
-ngOnInit() {
-  const token: string | null = localStorage.getItem('token');
-  if (token) {
-    
-    this.router.navigate(['/home']);
-  }
-} 
-  async doRegister() {
-    try {
-      this.isError = false;
-      await this.auth.register(this.username, this.email, this.password);
-      this.message.set('Inscription OK');
-      this.router.navigateByUrl('/login');
-    } catch (e: any) {
-      this.isError = true;
-      const msg = e?.error?.message || e?.message || e?.statusText || 'Erreur inscription';
-      
-      this.message.set(msg);
+  constructor() {}
+onRegister(form: NgForm) {
+  this.authService.register(form.value).subscribe({
+    next: (res:any) => {
+      // this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
+          if (res.token) {
+            this.errorMessage = null;
+            this.authService.saveToken(res.token);
+            this.router.navigate(['/home']); // صيفطو للصفحة الرئيسية بعد النجاح
+          }
+    },
+    error: (err) => {
+      this.errorMessage = err.error.message; // "Email already registered"
     }
-    
-  }
+  });
+}
 }
