@@ -2,11 +2,12 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet,Router } from '@angular/router';
 import { Navbar } from './components/navbar/navbar'; 
 import { CommonModule } from '@angular/common';
+import { CreatePostComponent } from './components/create-post/create-post';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Navbar, CommonModule],
+  imports: [RouterOutlet, Navbar, CommonModule,CreatePostComponent],
   templateUrl: './app.html',
   styleUrls: ['./app.css'] // tu avais écrit styleUrl → c'est styleUrls
 })

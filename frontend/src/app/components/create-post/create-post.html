@@ -1,13 +1,49 @@
-<div class="create-post-form">
-  <h2>{{ mode === 'create' ? 'Create Post' : 'Edit Post' }}</h2>
+<div class="modal fade" id="createPostModal" tabindex="-1" aria-labelledby="createPostModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+      
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title fw-bold w-100 text-center" id="createPostModalLabel">
+          {{ mode === 'create' ? 'Create Post' : 'Edit Post' }}
+        </h5>
+        <button type="button" (click)="resetForm()" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
 
-  <textarea [(ngModel)]="description" placeholder="Description..."></textarea>
-  <input type="file" (change)="onFileSelected($event)" accept="image/*,video/*" />
+      <div class="modal-body">
+        <textarea [(ngModel)]="description" 
+                  class="form-control border-0 fs-5 mb-3" 
+                  rows="4" 
+                  placeholder="What's on your mind?" 
+                  style="resize: none; box-shadow: none;"></textarea>
 
-  <div class="buttons">
-    <button (click)="submitPost()">
-      {{ mode === 'create' ? 'Publish' : 'Save Changes' }}
-    </button>
+        @if (imagePreview) {
+          <div class="position-relative mb-3">
+            <img [src]="imagePreview" class="img-fluid rounded border shadow-sm w-100" style="max-height: 300px; object-fit: cover;" alt="preview">
+            <button type="button" (click)="removeImage()" 
+                    class="btn-close position-absolute top-0 end-0 m-2 bg-white p-2 shadow-sm rounded-circle"></button>
+          </div>
+        }
+
+        <div class="d-flex justify-content-between align-items-center border rounded-3 p-2 bg-light">
+           <span class="small fw-bold text-muted ps-2">Add to your post</span>
+           <label for="fileInput" class="btn btn-light rounded-circle text-success border-0 mb-0">
+             <i class="bi bi-image fs-5"></i>
+             <input type="file" id="fileInput" (change)="onFileSelected($event)" 
+                    accept="image/*" class="d-none" /> 
+           </label>
+        </div>
+      </div>
+
+      <div class="modal-footer border-top-0 px-3 pb-3">
+        <button type="button" (click)="submitPost()" 
+                class="btn btn-primary w-100 fw-bold py-2 rounded-3 shadow-sm" 
+                style="background-color: #0d6efd;"
+                [disabled]="!description.trim() && !file"
+                data-bs-dismiss="modal">
+          {{ mode === 'create' ? 'Post' : 'Update' }}
+        </button>
+      </div>
+
+    </div>
   </div>
-  <ng-content></ng-content>
 </div>

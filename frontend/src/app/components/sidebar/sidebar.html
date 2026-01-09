@@ -1,0 +1,28 @@
+<div class="profile-header text-center" *ngIf="user">
+    <div class="banner bg-primary bg-gradient" style="height: 60px;"></div>
+    <div class="avatar-container">
+      <div class="rounded-circle bg-white p-1 mx-auto shadow-sm" style="width: 80px; height: 80px; margin-top: -40px;">
+        <a  class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-3 h-100"  routerLink="/my-posts">
+          {{ user.username.charAt(0).toUpperCase() }}
+        </a>
+
+      </div>
+    </div>
+    <div class="mt-2 pb-3 px-2 border-bottom">
+      <h6 class="fw-bold mb-0">{{ user.username }}</h6>
+      <p class="text-muted small mb-0">{{ user.email }}</p>
+    </div>
+
+    <div class="stats-section py-2 bg-light bg-opacity-50">
+      <div class="row g-0">
+        <div class="col-6 border-end text-center p-2">
+          <span class="d-block fw-bold text-primary">{{ user.followers || 0 }}</span>
+          <small class="text-muted" style="font-size: 0.75rem;">Followers</small>
+        </div>
+        <div class="col-6 text-center p-2">
+          <span class="d-block fw-bold text-primary">{{ user.following || 0 }}</span>
+          <small class="text-muted" style="font-size: 0.75rem;">Following</small>
+        </div>
+      </div>
+    </div>
+</div>

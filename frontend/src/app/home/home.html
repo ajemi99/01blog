@@ -1,22 +1,78 @@
-<div class="container">
+<!-- <div class="container">
 
 <button class="create-post-btn" (click)="openCreatePost()">Create Post</button>
 
-</div>
+</div> -->
 
 <!-- Popup -->
-<div class="popup" *ngIf="showPopup">
+<!-- <div class="popup" *ngIf="showPopup">
   <app-create-post
     [mode]="editMode ? 'edit' : 'create'"
     [postData]="selectedPost"
     (postCreated)="onPostCreated($event)">
     <button class="close-btn" (click)="closePopup()">×</button>
   </app-create-post>
-</div>
+</div> -->
 
 <!-- Posts List -->
-<app-post-list 
+<!-- <app-post-list 
   [posts]="posts" 
   (editRequested)="openEditPost($event)"
   (deleteRequested)="deletePost($event)">
-</app-post-list>
+</app-post-list> -->
+<div class="container mt-5 pt-3">
+  <div class="row g-4">
+    
+    <div class="col-lg-3 d-none d-lg-block">
+      <app-sidebar></app-sidebar>
+    </div>
+
+    <div class="col-12 col-lg-6">
+      
+      <app-create-post (postCreated)="onNewPostCreated($event)"></app-create-post>
+
+      @for (post of posts; track post.id) {
+        <div class="card border-0 shadow-sm mb-4 rounded-3 overflow-hidden">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                {{ post.authorUsername?.charAt(0) }}
+              </div>
+              <div>
+                <h6 class="mb-0 fw-bold">{{ post.authorUsername }}</h6>
+                <small class="text-muted">{{ post.createdAt | date:'medium' }}</small>
+              </div>
+            </div>
+            
+            <p class="card-text">{{ post.description }}</p>
+<div class="post-media-container mt-3 mb-3 bg-light rounded border overflow-hidden">
+  @if (isImage(post.mediaUrl)) {
+    <img [src]="'http://localhost:8080' + post.mediaUrl" 
+         class="img-fluid w-100 h-100 object-fit-cover" 
+         alt="post image" />
+  }
+
+  @if (isVideo(post.mediaUrl)) {
+    <video controls class="w-100 h-100 shadow-sm">
+      <source [src]="'http://localhost:8080' + post.mediaUrl" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  }
+</div>
+          </div>
+          
+          <div class="card-footer bg-white border-0 d-flex justify-content-around pb-3 text-secondary">
+             <span><i class="bi bi-heart me-1"></i> Like</span>
+             <span><i class="bi bi-chat me-1"></i> Comment</span>
+          </div>
+        </div>
+      } @empty {
+        <div class="text-center p-5 text-muted">
+           <i class="bi bi-postage fs-1"></i>
+           <p>No posts yet. Be the first to post!</p>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

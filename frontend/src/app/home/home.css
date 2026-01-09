@@ -118,3 +118,32 @@ margin-top: 10px;
 .popup app-create-post .close-btn:hover {
   background-color: #ff1e1e;
 }
+/* Container dial l-media */
+.post-media-container {
+    max-height: 500px; /* Bach l-video/image mat-kounch twila bzaf */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa; /* Color khfif f l-background ila kant media sghira */
+}
+
+/* T-7sin l-image */
+.object-fit-cover {
+    object-fit: contain; /* "contain" bach tswira t-ban kamla, "cover" bach t-3mmer l-box */
+    max-height: 500px;
+}
+
+/* Video Style */
+video {
+    outline: none;
+    max-height: 500px;
+    background-color: #000; /* Black background b7al YouTube */
+}
+
+/* Card hover effect */
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+.card:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}

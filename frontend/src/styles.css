@@ -2,3 +2,7 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+    /* Height dial navbar taqriban 70px, khassna n-zido chwiya d l-faragh */
+    padding-top: 85px !important; 
+}

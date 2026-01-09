@@ -33,12 +33,19 @@ export class PostService {
     
   }
 
-  createPost(description: string, file?: File): Observable<Post> {
+createPost(description: string, file?: File): Observable<any> {
     const formData = new FormData();
     formData.append('description', description);
-    if (file) formData.append('file', file!);
-    return this.http.post<Post>(this.apiUrl, formData, { withCredentials: true });
+    if (file) {
+      formData.append('file', file);
+    }
+    return this.http.post(this.apiUrl, formData);
   }
+  // Method bach tjib l-feed
+  getFeed(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/feed`);
+  }
+  
 
   deletePost(id: number) {
   return this.http.delete(`http://localhost:8080/api/posts/${id}`);
@@ -61,6 +68,5 @@ export class PostService {
 getMyPosts(userId: number): Observable<Post[]> {
   return this.http.get<Post[]>(`${this.apiUrl}/my-posts/${userId}`);
 }
-
 
 }

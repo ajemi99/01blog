@@ -7,8 +7,9 @@ import org.springframework.stereotype.Service;
 
 import com.ajemi.backend.dto.UserSearchDTO;
 import com.ajemi.backend.entity.User;
-import com.ajemi.backend.repository.UserRepository;
 import com.ajemi.backend.repository.FollowRepository;
+import com.ajemi.backend.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,8 +19,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
 
-     public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
+     public User findUser(long  userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 

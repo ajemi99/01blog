@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
@@ -6,111 +6,148 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CreatePostComponent } from '../components/create-post/create-post';
 import { PostListComponent } from '../components/post-list/post-list';
+import { Sidebar } from '../components/sidebar/sidebar';
+import { PostService } from '../services/post.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, CommonModule, CreatePostComponent, PostListComponent],
+  imports: [FormsModule, CommonModule, CreatePostComponent, PostListComponent,Sidebar,PostListComponent],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
 
-  username = signal('');
-  roles: string[] = [];
-  posts: any[] = [];
-  showMyPosts: boolean = false;
-  showPopup = false;
-  editMode = false;
-  selectedPost: any = null;
+//   username = signal('');
+//   roles: string[] = [];
+//   posts: any[] = [];
+//   showMyPosts: boolean = false;
+//   showPopup = false;
+//   editMode = false;
+//   selectedPost: any = null;
 
-  constructor(
-    private auth: AuthService,
-    private router: Router,
-    private http: HttpClient
-  ) {
-    auth.checkToken();
-    const token = localStorage.getItem('token');
+//   constructor(
+//     private auth: AuthService,
+//     private router: Router,
+//     private http: HttpClient
+//   ) {
+//     auth.checkToken();
+//     const token = localStorage.getItem('token');
 
-    if (token && token.split('.').length === 3) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        this.username.set(payload.sub);
-        const roles = payload.roles || payload.role;
-        this.roles = Array.isArray(roles) ? roles : [roles];
-      } catch (e) {
-        console.error('Erreur token', e);
-        this.logout();
-      }
-    } else {
-      this.logout();
-    }
-  }
+//     if (token && token.split('.').length === 3) {
+//       try {
+//         const payload = JSON.parse(atob(token.split('.')[1]));
+//         this.username.set(payload.sub);
+//         const roles = payload.roles || payload.role;
+//         this.roles = Array.isArray(roles) ? roles : [roles];
+//       } catch (e) {
+//         console.error('Erreur token', e);
+//         this.logout();
+//       }
+//     } else {
+//       this.logout();
+//     }
+//   }
 
-  goToMyPosts() {
-    console.log(this.username);
+//   goToMyPosts() {
+//     console.log(this.username);
     
-    this.router.navigate(['/my-posts']);
+//     this.router.navigate(['/my-posts']);
+//   }
+//   ngOnInit() {
+//     this.loadPosts();
+//   }
+
+// loadPosts() {
+//   console.log("User roles:", this.roles);
+
+//   if (!this.roles || this.roles.length === 0) {
+//     console.warn("No roles found, default to user feed");
+//   }
+
+//   let url = "http://localhost:8080/api/posts/feed"; // default user feed
+//   // if (this.roles && this.roles.includes("ADMIN")) {
+//   //   url = "http://localhost:8080/api/admin/posts"; // admin sees all
+//   // }
+
+//   this.http.get(url).subscribe({
+//     next: (data: any) => {
+//       this.posts = data;
+//       console.log(data);
+//     },
+//     error: (err) => console.error(err)
+//   });
+// }
+
+
+
+//   openCreatePost() {
+//     this.editMode = false;
+//     this.selectedPost = null;
+//     this.showPopup = true;
+//   }
+
+//   openEditPost(post: any) {
+//     this.editMode = true;
+//     this.selectedPost = post;
+//     this.showPopup = true;
+//   }
+
+//   onPostCreated(newPost: any) {
+//     if (this.editMode) {
+//       const index = this.posts.findIndex(p => p.id === newPost.id);
+//       if (index > -1) this.posts[index] = newPost;
+//     } else {
+//       this.posts.unshift(newPost);
+//     }
+
+//     this.closePopup();
+//   }
+
+//   closePopup() {
+//     this.showPopup = false;
+//   }
+
+//   logout() {
+//     localStorage.removeItem('token');
+//     this.router.navigate(['/login']);
+//   }
+//   deletePost(id: number) {
+//   this.posts = this.posts.filter(post => post.id !== id);
+// }
+posts: any[] = [];
+private postService = inject(PostService)
+
+  constructor() {}
+
+  ngOnInit(): void {
+    this.loadFeed();
   }
-  ngOnInit() {
-    this.loadPosts();
+
+  loadFeed() {
+    this.postService.getFeed().subscribe({
+      next: (data) => {
+        this.posts = data;
+        console.log('Feed loaded ✅', this.posts);
+      },
+      error: (err) => console.error('Error loading feed ❌', err)
+    });
   }
 
-loadPosts() {
-  console.log("User roles:", this.roles);
-
-  if (!this.roles || this.roles.length === 0) {
-    console.warn("No roles found, default to user feed");
+  // Had l-function m-rbuta m3a l-Modal (Output)
+  onNewPostCreated(newPost: any) {
+    // Kat-zid l-post l-jdīd f l-foq dial l-list bla refresh
+    this.posts.unshift(newPost);
+  }
+    isImage(fileUrl: string | undefined): boolean {
+    if (!fileUrl) return false;
+    const ext = fileUrl.split('.').pop()?.toLowerCase();
+    return ['jpg','jpeg','png','gif'].includes(ext!);
   }
 
-  let url = "http://localhost:8080/api/posts/feed"; // default user feed
-  // if (this.roles && this.roles.includes("ADMIN")) {
-  //   url = "http://localhost:8080/api/admin/posts"; // admin sees all
-  // }
-
-  this.http.get(url).subscribe({
-    next: (data: any) => {
-      this.posts = data;
-      console.log(data);
-    },
-    error: (err) => console.error(err)
-  });
-}
-
-
-
-  openCreatePost() {
-    this.editMode = false;
-    this.selectedPost = null;
-    this.showPopup = true;
+  isVideo(fileUrl: string | undefined): boolean {
+    if (!fileUrl) return false;
+    const ext = fileUrl.split('.').pop()?.toLowerCase();
+    return ['mp4','mov','webm'].includes(ext!);
   }
-
-  openEditPost(post: any) {
-    this.editMode = true;
-    this.selectedPost = post;
-    this.showPopup = true;
-  }
-
-  onPostCreated(newPost: any) {
-    if (this.editMode) {
-      const index = this.posts.findIndex(p => p.id === newPost.id);
-      if (index > -1) this.posts[index] = newPost;
-    } else {
-      this.posts.unshift(newPost);
-    }
-
-    this.closePopup();
-  }
-
-  closePopup() {
-    this.showPopup = false;
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/login']);
-  }
-  deletePost(id: number) {
-  this.posts = this.posts.filter(post => post.id !== id);
-}
 }

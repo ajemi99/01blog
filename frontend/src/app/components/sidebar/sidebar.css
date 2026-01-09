@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 90px;
+  z-index: 100;
+  
+  /* --- Hna fin t-7kkem f l-width dial PC --- */
+  width: 100%; 
+  max-width: 1px; /* Kabbar had l-rqm bach t-kber f PC */
+}
+
+@media (max-width: 991px) {
+  :host {
+    /* --- Hna fin t-7kkem f l-width dial Tablet --- */
+    max-width: 280px; 
+  }
+}
