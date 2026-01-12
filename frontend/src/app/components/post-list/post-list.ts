@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter,OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { PostService, Post } from '../../services/post.service';
  import { LikeService } from '../../services/LikeService'; 
 import { CommentComponent } from '../comment/comment';

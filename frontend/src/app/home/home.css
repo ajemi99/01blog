@@ -1,149 +1,39 @@
-.container {
-max-width: 900px;
-margin: 0 auto;
-padding: 20px;
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-background-color: #f9f9f9;
-}
-
-.navbar {
-display: flex;
-justify-content: space-between;
-align-items: center;
-background-color: #fff;
-padding: 10px 20px;
-border-radius: 8px;
-box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.navbar h1 {
-font-size: 24px;
-margin: 0;
-}
-
-.navbar button  {
-padding: 6px 12px;
-border: none;
-border-radius: 5px;
-background-color: black;
-color: #fff;
-cursor: pointer;
-}
-
-.navbar button:hover {
-background-color: #d81828;
-}
-
-/* Bouton Create Post */
-.create-post-btn {
-  padding: 10px 20px;
-  background-color: black; /* vert vif */
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  margin: 20px 0;
-  float: right; /* pour le mettre à droite */
-  transition: background 0.2s, transform 0.2s;
-}
-
-.create-post-btn:hover {
-  background-color: #218838; /* vert plus foncé au hover */
-  transform: translateY(-2px);
-}
-
-
-.post-card {
-background-color: #fff;
-padding: 15px;
-margin: 15px 0;
-border-radius: 10px;
-box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.post-card p {
-margin: 5px 0;
-}
-
-.post-card img,
-.post-card video {
-max-width: 100%;
-border-radius: 8px;
-margin-top: 10px;
-}
-
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.popup app-create-post {
-  position: relative; /* Important pour le bouton */
-  background-color: #fff;
-  padding: 30px 20px 20px 20px; /* padding top pour le bouton */
-  border-radius: 10px;
-  min-width: 300px;
-  max-width: 500px;
-  width: 90%;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-/* Bouton Close */
-.popup app-create-post .close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: #ff5b5b;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  font-size: 18px;
-  line-height: 28px;
-  text-align: center;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.popup app-create-post .close-btn:hover {
-  background-color: #ff1e1e;
-}
-/* Container dial l-media */
-.post-media-container {
-    max-height: 500px; /* Bach l-video/image mat-kounch twila bzaf */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f8f9fa; /* Color khfif f l-background ila kant media sghira */
-}
-
-/* T-7sin l-image */
-.object-fit-cover {
-    object-fit: contain; /* "contain" bach tswira t-ban kamla, "cover" bach t-3mmer l-box */
-    max-height: 500px;
-}
-
-/* Video Style */
-video {
-    outline: none;
-    max-height: 500px;
-    background-color: #000; /* Black background b7al YouTube */
-}
-
-/* Card hover effect */
+/* Card Setup */
 .card {
-    transition: transform 0.2s ease-in-out;
+    overflow: visible !important; /* Bach dropdown mat-tqte3ch */
+    transition: transform 0.2s ease;
 }
-.card:hover {
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+
+/* Media Container */
+.post-media-container {
+    width: 100%;
+    max-height: 550px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.object-fit-contain {
+    object-fit: contain;
+    max-height: 550px;
+}
+
+/* Dropdown styling */
+.dropdown-item {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Actions styling */
+.post-action-btn:hover {
+    background-color: #f0f2f5;
+    color: #0d6efd !important;
+}
+
+.card-footer {
+    padding: 0;
 }

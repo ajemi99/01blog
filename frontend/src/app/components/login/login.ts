@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { Router,RouterLink} from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 @Component({
   selector: 'app-login',
   imports: [CommonModule, FormsModule,RouterLink],
@@ -23,7 +23,7 @@ export class Login {
 //     // parse token w set currentUser
     
 //     this.router.navigate(['/home']);
-//   }
+//   } 
 // } 
 // هاد الفانكشن كاتنفذ ملي المستخدم كيبرك على الزر
   onLogin(form: NgForm) {
@@ -34,7 +34,6 @@ export class Login {
           // نفترض أن الـ API كيرجع الـ token في خاصية سميتها token
           if (response.token) {
             this.errorMessage = null;
-            this.authService.saveToken(response.token);
             this.router.navigate(['/home']); // صيفطو للصفحة الرئيسية بعد النجاح
           }
         },

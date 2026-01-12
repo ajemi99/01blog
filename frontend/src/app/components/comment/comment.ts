@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommentService,CommentRequest,CommentResponse } from '../../services/comment.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../auth/auth.service'; 
+import { AuthService } from '../../services/auth/auth.service'; 
 import { Post } from '../../services/post.service';
 
 @Component({

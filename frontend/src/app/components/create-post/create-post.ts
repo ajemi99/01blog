@@ -12,8 +12,10 @@ import { PostService } from '../../services/post.service';
 })
 export class CreatePostComponent implements OnInit {
   @Output() postCreated = new EventEmitter<any>();
-  @Input() mode: 'create' | 'edit' = 'create';
-  @Input() postData: any = null;
+  
+  // Zdna had l-ID bach n-3erfou chmen post gha n-beddlou
+  postId: number | null = null; 
+  mode: 'create' | 'edit' = 'create';
 
   description: string = '';
   file: File | null = null;
@@ -21,12 +23,23 @@ export class CreatePostComponent implements OnInit {
 
   constructor(private postService: PostService) {}
 
-  ngOnInit() {
-    if (this.mode === 'edit' && this.postData) {
-      this.description = this.postData.description || '';
-      if (this.postData.imageUrl) {
-        this.imagePreview = this.postData.imageUrl;
-      }
+  ngOnInit() {}
+
+  // --- HADI HIYA L-MOUKKH: l-fonction li ghadi n-3eytou liha f Edit ---
+  openEditMode(post: any) {
+    this.mode = 'edit';
+    this.postId = post.id;
+    this.description = post.description;
+    
+    // Kat-chouf wach l-post fih mediaUrl bach t-tal3ha f l-preview
+    this.imagePreview = post.mediaUrl ? 'http://localhost:8080' + post.mediaUrl : null;
+
+    // Kat-7el l-modal (Bootstrap 5 logic)
+    const modalElement = document.getElementById('createPostModal');
+    if (modalElement) {
+      // @ts-ignore (Bach TypeScript may-t-chekkach 3la bootstrap)
+      const modal = new (window as any).bootstrap.Modal(modalElement);
+      modal.show();
     }
   }
 
@@ -45,32 +58,28 @@ export class CreatePostComponent implements OnInit {
   removeImage() {
     this.file = null;
     this.imagePreview = null;
-    // Reset l-input bach t-qder t-khtar nfs tswira ila bghiti
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
   }
 
   submitPost() {
-    if (!this.description.trim() && !this.file) {
-      alert("Please add some text or an image!");
-      return;
-    }
+    if (!this.description.trim() && !this.file) return;
 
     if (this.mode === 'create') {
       this.postService.createPost(this.description, this.file ?? undefined).subscribe({
         next: (newPost) => {
-          this.resetForm();
           this.postCreated.emit(newPost);
-        },
-        error: (err) => console.error('Error:', err)
+          this.resetForm();
+        }
       });
     } else {
-      this.postService.updatePost(this.postData.id, this.description, this.file ?? undefined).subscribe({
+      // EDIT MODE: Kan-siftou l-postId li khzenna mlli t-7ellat l-modal
+      this.postService.updatePost(this.postId!, this.description, this.file ?? undefined).subscribe({
         next: (updatedPost) => {
-          this.resetForm();
           this.postCreated.emit(updatedPost);
+          this.resetForm();
         },
-        error: (err) => console.error('Error:', err)
+        error: (err) => console.error('Update error:', err)
       });
     }
   }
@@ -79,5 +88,7 @@ export class CreatePostComponent implements OnInit {
     this.description = '';
     this.file = null;
     this.imagePreview = null;
+    this.mode = 'create'; // Dima rjje3ha create mlli t-sali
+    this.postId = null;
   }
 }

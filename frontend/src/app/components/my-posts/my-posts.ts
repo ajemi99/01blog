@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PostService,Post } from '../../services/post.service';
-import { AuthService } from '../../auth/auth.service'; 
+import { AuthService } from '../../services/auth/auth.service'; 
 import { CommentService } from '../../services/comment.service';
 import { PostListComponent } from '../post-list/post-list';
 import { Router } from '@angular/router';

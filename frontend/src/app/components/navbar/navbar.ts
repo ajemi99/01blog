@@ -11,11 +11,9 @@ export class Navbar {
   constructor(private router: Router) {}
 
   onLogout() {
-    // 1. Mssem l-Token
-    localStorage.removeItem('token');
-    
-    // 2. Rediriger l-user l-Login
-    this.router.navigate(['/login']);
+  localStorage.removeItem('token');
+//  this.userSubject.next(null); // Khwi l-khzana dial RAM
+  window.location.href = '/login';
   }
   openCreatePost() {
     console.log("Modal for creating a post opened!");

@@ -1,17 +1,24 @@
 :host {
-  display: block;
-  position: sticky;
-  top: 90px;
-  z-index: 100;
-  
-  /* --- Hna fin t-7kkem f l-width dial PC --- */
-  width: 100%; 
-  max-width: 1px; /* Kabbar had l-rqm bach t-kber f PC */
+    display: block;
+    position: sticky;
+    top: 90px;
+    z-index: 100;
 }
 
-@media (max-width: 991px) {
-  :host {
-    /* --- Hna fin t-7kkem f l-width dial Tablet --- */
-    max-width: 280px; 
-  }
+.sidebar-container {
+    transition: all 0.3s ease;
+}
+
+.sidebar-banner {
+    background: linear-gradient(45deg, #0d6efd, #0dcaf0);
+}
+
+.avatar-wrapper {
+    position: relative;
+    z-index: 2;
+}
+
+/* Hover effect khfif */
+.sidebar-container:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
 }

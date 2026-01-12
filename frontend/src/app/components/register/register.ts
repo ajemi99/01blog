@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { Router,RouterLink} from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -23,7 +23,6 @@ onRegister(form: NgForm) {
       // this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
           if (res.token) {
             this.errorMessage = null;
-            this.authService.saveToken(res.token);
             this.router.navigate(['/home']); // صيفطو للصفحة الرئيسية بعد النجاح
           }
     },

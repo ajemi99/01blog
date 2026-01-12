@@ -1,8 +1,9 @@
-/* You can add global styles to this file, and also import other style files */
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 body {
-    /* Height dial navbar taqriban 70px, khassna n-zido chwiya d l-faragh */
-    padding-top: 85px !important; 
+  background-color: #f0f2f5 !important; /* Lon dial Facebook jdid, nqi l-l3in */
+  padding-top: 80px !important;
+}
+
+/* T-7sinat l-Bootstrap cards */
+.card-body {
+  padding: 20px !important;
 }
