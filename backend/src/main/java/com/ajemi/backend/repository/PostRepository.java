@@ -17,6 +17,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByAuthor_IdInOrderByCreatedAtDesc(List<Long> authorIds);
     void deleteAllByAuthor(User author);
     List<Post> findAllByAuthor(User author);
+    int countByAuthor_Id(Long id);
 }
 
 

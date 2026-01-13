@@ -3,15 +3,16 @@ import { Login } from './components/login/login';
 import { Register } from './components/register/register'; 
 import { Home } from './home/home';
 import { authGuard } from './services/auth/auth.guard';
-import { MyPostsComponent } from './components/my-posts/my-posts';
+import { Profile } from './components/profile/profile';
+// import { MyPostsComponent } from './components/my-posts/my-posts';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   { path: 'home', component: Home, canActivate: [authGuard] },
-  { path: 'my-posts', component: MyPostsComponent },
-  { path: 'user-posts/:id', component: MyPostsComponent },
+  { path: 'profile/:username', component: Profile },
+  // { path: 'my-posts', component: MyPostsComponent },
+  // { path: 'user-posts/:id', component: MyPostsComponent },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: '**', redirectTo: 'home' },
-
 ];

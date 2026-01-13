@@ -1,0 +1,34 @@
+.post-container {
+    cursor: pointer;
+}
+
+/* L-Overlay kiy-ghtti t-swira kamla */
+.post-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Lon k7el m-dfi */
+    opacity: 0; /* M-khbi f l-lowel */
+    transition: opacity 0.3s ease; /* Animation smooth */
+    padding: 15px;
+}
+
+/* Mlli l-user i-hoveri 3la l-container, l-overlay kiban */
+.post-container:hover .post-overlay {
+    opacity: 1;
+}
+
+/* Bach t-ji l-description m-rattba */
+.description-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Max 3 d s-toura bach may-khrejch 3la l-card */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-weight: 500;
+}
+
+.object-fit-cover {
+    object-fit: cover;
+}

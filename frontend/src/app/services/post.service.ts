@@ -3,22 +3,22 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CommentResponse } from './comment.service';
 
-export interface Post {
-  id: number;
-  description: string;
-  authorId: number; 
-  mediaUrl?: string;
-  authorUsername: string;
-  createdAt: string;
-  showMenu?: boolean;
-  updatedAt: string;
-  likesCount: number;
-  liked?: boolean;
-  isLiking?: boolean; 
-  showComments?: boolean; 
-  comments?: CommentResponse[];
-  newComment?: string;
-}
+// export interface Post {
+//   id: number;
+//   description: string;
+//   authorId: number; 
+//   mediaUrl?: string;
+//   authorUsername: string;
+//   createdAt: string;
+//   showMenu?: boolean;
+//   updatedAt: string;
+//   likesCount: number;
+//   liked?: boolean;
+//   isLiking?: boolean; 
+//   showComments?: boolean; 
+//   comments?: CommentResponse[];
+//   newComment?: string;
+// }
 
 @Injectable({
   providedIn: 'root'
@@ -28,10 +28,10 @@ export class PostService {
 
   constructor(private http: HttpClient) {}
 
-  getPosts(): Observable<Post[]> {
-    return this.http.get<Post[]>(this.apiUrl, { withCredentials: true });
+  // getPosts(): Observable<Post[]> {
+  //   return this.http.get<Post[]>(this.apiUrl, { withCredentials: true });
     
-  }
+  // }
 
 createPost(description: string, file?: File): Observable<any> {
     const formData = new FormData();
@@ -59,14 +59,14 @@ createPost(description: string, file?: File): Observable<any> {
     formData.append('file', file);
   }
 
-  return this.http.put<Post>(
+  return this.http.put<any>(
     `http://localhost:8080/api/posts/${postId}`,
     formData,
     { withCredentials: true }
   );
 }
-getMyPosts(userId: number): Observable<Post[]> {
-  return this.http.get<Post[]>(`${this.apiUrl}/my-posts/${userId}`);
-}
+// getMyPosts(userId: number): Observable<Post[]> {
+//   return this.http.get<Post[]>(`${this.apiUrl}/my-posts/${userId}`);
+// }
 
 }

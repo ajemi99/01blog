@@ -36,7 +36,11 @@ export class App {
   }
 
   shouldShowNavbar(): boolean {
-    const hiddenRoutes = ['/login', '/register', '/'];
+    const hiddenRoutes = ['/login', '/register'];
+    return !hiddenRoutes.includes(this.router.url);
+  }
+  shouldShowSidbar():boolean {
+    const hiddenRoutes = ['/login', '/register', '/profile/1'];
     return !hiddenRoutes.includes(this.router.url);
   }
 }

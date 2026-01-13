@@ -27,3 +27,23 @@
         border-left: 1px solid #dee2e6 !important;
     }
 }
+.search-results {
+  z-index: 2000; /* Khass i-koun kber men l-navbar w l-blur */
+  top: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-item {
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.search-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Bach l-container dial l-form i-koun houwa l-reference */
+.position-relative {
+  position: relative;
+}

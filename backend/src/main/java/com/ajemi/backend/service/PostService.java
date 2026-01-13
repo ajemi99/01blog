@@ -79,7 +79,7 @@ public class PostService {
     // ===============================
     // Convert Post entity to DTO
     // ===============================
-   public PostResponseDTO mapToDTO(Post post, String currentUsername) {
+   public  PostResponseDTO mapToDTO(Post post, String currentUsername) {
     PostResponseDTO dto = new PostResponseDTO();
     dto.setId(post.getId());
     dto.setDescription(post.getDescription());

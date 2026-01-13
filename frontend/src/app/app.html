@@ -1,6 +1,6 @@
 <app-navbar *ngIf="shouldShowNavbar()"></app-navbar>
 
-<div class="container-fluid mt-5 pt-4 px-lg-5" *ngIf="shouldShowNavbar()">
+<div class="container-fluid mt-5 pt-4 px-lg-5" *ngIf="shouldShowSidbar()">
   <div class="row g-4 justify-content-center">
     
     <aside class="col-lg-3 d-none d-lg-block">
@@ -14,7 +14,7 @@
   </div>
 </div>
 
-<div *ngIf="!shouldShowNavbar()">
+<div *ngIf="!shouldShowNavbar() || !shouldShowSidbar()">
   <router-outlet></router-outlet>
 </div>
 

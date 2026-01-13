@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CreatePostComponent } from '../components/create-post/create-post';
-import { PostListComponent } from '../components/post-list/post-list';
+// import { PostListComponent } from '../components/post-list/post-list';
 import { Sidebar } from '../components/sidebar/sidebar';
 import { PostService } from '../services/post.service';
 import { log } from 'console';
@@ -219,7 +219,6 @@ toggleComments(currentPost: any) {
   // 1. Ila l-post kan aslan m7loum, ghir n-seddoh (Toggle normal)
   if (currentPost.showComments) {
     currentPost.showComments = false;
-    
     return;
   }
 
