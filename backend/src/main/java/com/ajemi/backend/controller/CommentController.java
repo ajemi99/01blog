@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ajemi.backend.dto.CommentRequestDTO;
 import com.ajemi.backend.dto.CommentResponseDTO;
+import com.ajemi.backend.security.UserDetailsImpl;
 import com.ajemi.backend.service.CommentService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,12 +28,12 @@ public class CommentController {
     private final CommentService commentService;
 
     // Ajouter un commentaire
-    @PostMapping("/add/{userId}")
+    @PostMapping("/add")
     public ResponseEntity<CommentResponseDTO> addComment(
-            @PathVariable Long userId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody CommentRequestDTO request
     ) {
-        CommentResponseDTO response = commentService.addComment(userId, request);
+        CommentResponseDTO response = commentService.addComment(userDetails.getId(), request);
         return ResponseEntity.ok(response);
     }
 
@@ -44,12 +46,12 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
-    @DeleteMapping("/{commentId}/user/{userId}")
+    @DeleteMapping("/{commentId}")
     public ResponseEntity<?> deleteComment(
         @PathVariable Long commentId,
-        @PathVariable Long userId
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        commentService.deleteComment(commentId, userId);
+        commentService.deleteComment(commentId, userDetails.getId());
         return ResponseEntity.ok(Map.of("message", "Commentaire supprimé"));
     }
 

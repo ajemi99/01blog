@@ -1,28 +1,5 @@
-<!-- <div class="container">
-
-<button class="create-post-btn" (click)="openCreatePost()">Create Post</button>
-
-</div> -->
-
-<!-- Popup -->
-<!-- <div class="popup" *ngIf="showPopup">
-  <app-create-post
-    [mode]="editMode ? 'edit' : 'create'"
-    [postData]="selectedPost"
-    (postCreated)="onPostCreated($event)">
-    <button class="close-btn" (click)="closePopup()">×</button>
-  </app-create-post>
-</div> -->
-
-<!-- Posts List -->
-<!-- <app-post-list 
-  [posts]="posts" 
-  (editRequested)="openEditPost($event)"
-  (deleteRequested)="deletePost($event)">
-</app-post-list> -->
 <div class="container mt-5 pt-3">
   <div class="row g-4 justify-content-center">
-    
     <div class="col-12 col-lg-8">
       
       <app-create-post #createPostComp (postCreated)="onNewPostCreated($event)"></app-create-post>
@@ -30,7 +7,6 @@
       @for (post of posts; track post.id) {
         <div class="card border-0 shadow-sm mb-4 rounded-3">
           <div class="card-body">
-            
             <div class="d-flex align-items-center justify-content-between mb-3">
               <div class="d-flex align-items-center">
                 <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 42px; height: 42px; font-weight: bold;">
@@ -47,7 +23,6 @@
                   <i class="bi bi-three-dots-vertical fs-5"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2 rounded-3">
-                  
                   @if (isOwner(post)) {
                     <li>
                       <button class="dropdown-item rounded-2 py-2" (click)="createPostComp.openEditMode(post)">
@@ -61,7 +36,6 @@
                     </li>
                     <li><hr class="dropdown-divider"></li>
                   }
-
                   <li>
                     <button class="dropdown-item rounded-2 py-2 text-warning">
                       <i class="bi bi-flag me-2"></i> Report
@@ -75,28 +49,70 @@
 
             <div class="post-media-container mt-3 mb-2 bg-light rounded border overflow-hidden">
               @if (isImage(post.mediaUrl)) {
-                <img [src]="'http://localhost:8080' + post.mediaUrl" 
-                     class="img-fluid w-100 object-fit-contain" 
-                     style="max-height: 500px;" />
+                <img [src]="'http://localhost:8080' + post.mediaUrl" class="img-fluid w-100 object-fit-contain" style="max-height: 500px;" />
               }
-
               @if (isVideo(post.mediaUrl)) {
                 <video controls class="w-100 h-100 shadow-sm bg-black">
                   <source [src]="'http://localhost:8080' + post.mediaUrl" type="video/mp4" />
-                  Your browser does not support the video tag.
                 </video>
               }
             </div>
           </div>
 
           <div class="card-footer bg-white border-0 d-flex justify-content-around pb-3 text-secondary border-top">
-            <button class="btn btn-link text-decoration-none text-secondary w-50 py-2 post-action-btn">
-              <i class="bi bi-heart me-1"></i> Like
+            <button class="btn btn-link text-decoration-none w-50 py-2 post-action-btn" (click)="onLike(post)" [disabled]="post.isLiking">
+              <div class="d-flex align-items-center justify-content-center">
+                @if (post.isLiking) {
+                  <div class="spinner-border spinner-border-sm me-2 text-secondary" role="status"></div>
+                } @else {
+                  <i class="bi" [ngClass]="post.liked ? 'bi-heart-fill text-danger animate-like' : 'bi-heart text-secondary'"></i>
+                }
+                <span class="ms-2" [class.text-danger]="post.liked">{{ post.liked ? 'Liked' : 'Like' }}</span>
+                @if (post.likesCount > 0) { <span class="ms-1 small text-muted">({{ post.likesCount }})</span> }
+              </div>
             </button>
-            <button class="btn btn-link text-decoration-none text-secondary w-50 py-2 post-action-btn border-start">
-              <i class="bi bi-chat me-1"></i> Comment
+            <button class="btn btn-link text-decoration-none text-secondary w-50 py-2 post-action-btn border-start" (click)="toggleComments(post)">
+             <i class="bi bi-chat-left-text me-1"></i>
+              <span>Comment @if(post.commentCount > 0) { ({{post.commentCount}}) }</span>
             </button>
           </div>
+
+          @if (post.showComments) {
+            <div class="bg-light p-3 border-top">
+              <div class="d-flex mb-3">
+                <input type="text" class="form-control form-control-sm rounded-pill shadow-none" placeholder="Écrire un commentaire..." [(ngModel)]="post.newCommentText" (keyup.enter)="onAddComment(post)">
+                <button class="btn btn-primary btn-sm rounded-pill ms-2" (click)="onAddComment(post)">
+                  <i class="bi bi-send"></i>
+                </button>
+              </div>
+
+              @if (post.isLoadingComments) {
+                <div class="text-center py-2"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+              }
+
+              <div class="comment-list">
+                @for (comment of post.comments; track comment.id) {
+                  <div class="d-flex mb-2 align-items-start">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="width: 30px; height: 30px; font-size: 11px;">
+                      {{ comment.username.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="bg-white p-2 px-3 rounded-3 shadow-sm border position-relative flex-grow-1">
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-bold small">{{ comment.username }}</span>
+                        <small class="text-muted" style="font-size: 10px;">{{ comment.createdAt | date:'short' }}</small>
+                      </div>
+                      <p class="mb-0 small text-dark">{{ comment.content }}</p>
+                      @if (comment.username === currentUser?.username) {
+                        <button class="btn btn-link text-danger p-0 position-absolute top-0 end-0 me-2 mt-1" (click)="onDeleteComment(post, comment.id)" style="font-size: 12px;">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
         </div>
       } @empty {
         <div class="text-center p-5 text-muted bg-white rounded shadow-sm">

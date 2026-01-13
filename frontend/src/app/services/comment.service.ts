@@ -22,14 +22,14 @@ export class CommentService {
 
   constructor(private http: HttpClient) {}
 
-  addComment(userId: number, request: CommentRequest): Observable<CommentResponse> {
-    return this.http.post<CommentResponse>(`${this.apiUrl}/add/${userId}`, request);
+  addComment(request: CommentRequest): Observable<CommentResponse> {
+    return this.http.post<CommentResponse>(`${this.apiUrl}/add`, request);
   }
 
   getCommentsByPost(postId: number): Observable<CommentResponse[]> {
     return this.http.get<CommentResponse[]>(`${this.apiUrl}/post/${postId}`);
   }
-   deleteComment(commentId: number, userId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${commentId}/user/${userId}`);
+   deleteComment(commentId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${commentId}`);
   }
 }

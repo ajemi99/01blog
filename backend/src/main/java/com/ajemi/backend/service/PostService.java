@@ -1,6 +1,5 @@
 package com.ajemi.backend.service;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,7 +91,7 @@ public class PostService {
 
     // عدد likes
     dto.setLikesCount(post.getLikes().size());
-
+    dto.setCommentCount(post.getComments().size());
     // واش user دار like
     boolean liked = post.getLikes().stream()
             .anyMatch(like -> like.getUser().getUsername().equals(currentUsername));

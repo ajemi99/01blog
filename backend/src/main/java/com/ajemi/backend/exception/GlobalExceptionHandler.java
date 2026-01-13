@@ -76,5 +76,6 @@ public ResponseEntity<Map<String, Object>> handleApiException(ApiException ex) {
                     "message", "Le fichier est trop volumineux. La taille maximale est de 10MB."
             ));
         }
+
 }
 

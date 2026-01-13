@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth/auth.service';
 import { PostService, Post } from '../../services/post.service';
  import { LikeService } from '../../services/LikeService'; 
-import { CommentComponent } from '../comment/comment';
+// import { CommentComponent } from '../comment/comment';
 import { Router } from '@angular/router';
 
 
@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   templateUrl: './post-list.html',
   styleUrls: ['./post-list.css'],
   standalone: true,
-  imports: [CommonModule,CommentComponent]
+  imports: [CommonModule]
 })
 export class PostListComponent{
 

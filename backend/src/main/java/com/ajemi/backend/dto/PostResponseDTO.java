@@ -26,5 +26,6 @@ public class PostResponseDTO {
 
     // optional: عدد likes
     private int likesCount = 0;
+    private int commentCount = 0;
 
 }

@@ -9,6 +9,8 @@ import { PostListComponent } from '../components/post-list/post-list';
 import { Sidebar } from '../components/sidebar/sidebar';
 import { PostService } from '../services/post.service';
 import { log } from 'console';
+import { LikeService } from '../services/LikeService';
+import { CommentService } from '../services/comment.service';
 // import { NgOptimizedImage } from '@angular/common';
 
 @Component({
@@ -120,6 +122,8 @@ export class Home implements OnInit {
       posts: any[] = [];
       private postService = inject(PostService)
       private  authService = inject(AuthService)
+      private likeService = inject(LikeService)
+      private commentService = inject(CommentService)
       currentUser: any;
       constructor() {}
       
@@ -178,10 +182,99 @@ onNewPostCreated(post: any) {
     return ['mp4','mov','webm'].includes(ext!);
   }
   // Function bach n-check-iw wach moul l-post
-isOwner(post: any): boolean {
-    if (!this.currentUser || !post) return false;
-    // Kandiro l-check b s-miya (Username) kima 3ndek f l-objer
-    return post.authorUsername === this.currentUser.username;
+  isOwner(post: any): boolean {
+      if (!this.currentUser || !post) return false;
+      // Kandiro l-check b s-miya (Username) kima 3ndek f l-objer
+      return post.authorUsername === this.currentUser.username;
+    }
+    onLike(post: any) {
+      // 1. Ila kante aslan isLiking kheddama, 7bess
+      if (post.isLiking) return;
+
+      // 2. Creer l-field f l-blassa w diro true
+      post.isLiking = true;
+
+      this.likeService.toggleLike(post.id).subscribe({
+        next: (res: any) => {
+          // res jay fih { "message": "liked" }
+          if (res.message === 'liked') {
+            post.liked = true;
+            post.likesCount++;
+          } else if (res.message === 'unliked') {
+            post.liked = false;
+            post.likesCount--;
+          }
+          
+          // 3. Rjje3ha false bach t-7iyyed spinner
+          post.isLiking = false;
+        },
+        error: (err) => {
+          console.error(err);
+          post.isLiking = false;
+        }
+      });
+    }
+    
+toggleComments(currentPost: any) {
+  // 1. Ila l-post kan aslan m7loum, ghir n-seddoh (Toggle normal)
+  if (currentPost.showComments) {
+    currentPost.showComments = false;
+    
+    return;
+  }
+
+  // 2. Sedd ga3 l-comments dial ga3 l-posts khorine
+  this.posts.forEach(p => {
+    if (p.id !== currentPost.id) {
+      p.showComments = false;
+    }
+  });
+
+  // 3. 7ell l-comments dial l-post li cliquina 3lih
+  currentPost.showComments = true;
+
+  // 4. Fetch data ila kant khawya (nafs l-logic dial qbila)
+  if (!currentPost.comments) {
+    currentPost.isLoadingComments = true;
+    this.commentService.getCommentsByPost(currentPost.id).subscribe({
+      next: (res) => {
+        currentPost.comments = res;
+        currentPost.isLoadingComments = false;
+      },
+      error: () => currentPost.isLoadingComments = false
+    });
+  }
+}
+
+  onAddComment(post: any) {
+    if (!post.newCommentText || !post.newCommentText.trim()) return;
+
+    const request = {
+      postId: post.id,
+      content: post.newCommentText
+    };
+
+    this.commentService.addComment(request).subscribe({
+      next: (newComment) => {
+        if (!post.comments) post.comments = [];
+        // Zid l-comment jdid l-fouq
+        post.comments.unshift(newComment);
+        post.newCommentText = ''; // Khwi l-input
+        // Ila 3ndek commentCount f l-post, tqder t-zidou
+        if(post.commentCount !== undefined) post.commentCount++;
+      }
+    });
+  }
+
+  onDeleteComment(post: any, commentId: number) {
+    if (confirm('Voulez-vous supprimer ce commentaire ?')) {
+      this.commentService.deleteComment(commentId).subscribe({
+        next: () => {
+          post.comments = post.comments.filter((c: any) => c.id !== commentId);
+          if(post.commentCount > 0) post.commentCount--;
+        }
+      });
+    }
   }
 
 }

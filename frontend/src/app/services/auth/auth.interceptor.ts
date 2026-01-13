@@ -8,29 +8,30 @@ export class AuthInterceptor implements HttpInterceptor {
   
   constructor(private router: Router) {}
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = localStorage.getItem('token'); // Awla 'this.tokenKey' dyalk
+ intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const token = localStorage.getItem('token');
     let authReq = req;
 
     if (token) {
-      authReq = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+        authReq = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
     }
 
-// auth.interceptor.ts
-return next.handle(authReq).pipe(
-  catchError((error: HttpErrorResponse) => {
-    // Check wach l-mouchkil machi f l-login endpoint
-    const isLoginRequest = req.url.includes('/login');
+    return next.handle(authReq).pipe(
+        catchError((error: HttpErrorResponse) => {
+            // 1. Check wach l-mouchkil machi f l-auth (login/register)
+            // T-akked ana l-path fih '/login' awla '/auth' 3la 7asab l-Backend dyalk
+            const isAuthRequest = req.url.includes('/login') || req.url.includes('/auth');
 
-    if ((error.status === 401 || error.status === 403) && !isLoginRequest) {
-      console.warn('Invalid Token! Clearing session...');
-      localStorage.removeItem('token');
-      window.location.href = '/login'; 
-    }
-    
-    // Khlli l-error t-douz bach l-Login Component i-qder i-choufha w i-t-afficha
-    return throwError(() => error);
-  })
-);
-  }
+            // 2. Ila 401/403 w MACHI auth request (ya3ni chi khtat f l-app), 3ad n-kharjouh
+            if ((error.status === 401 || error.status === 403) && !isAuthRequest) {
+                console.warn('Invalid Token! Redirecting...');
+                localStorage.removeItem('token');
+                window.location.href = '/login'; 
+            }
+            
+            // 3. DAROURI: rjje3 l-error (throwError) bach t-wesal l-Login Component
+            return throwError(() => error);
+        })
+    );
+}
 }
