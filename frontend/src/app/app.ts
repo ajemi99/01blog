@@ -39,9 +39,18 @@ export class App {
     const hiddenRoutes = ['/login', '/register'];
     return !hiddenRoutes.includes(this.router.url);
   }
+  
   shouldShowSidbar():boolean {
-    const hiddenRoutes = ['/login', '/register', '/profile/1'];
-    return !hiddenRoutes.includes(this.router.url);
+    const hiddenRoutes = ['/login', '/register'];
+    const currentUrl = this.router.url;
+     if (hiddenRoutes.includes(currentUrl)) {
+      return false;
+    }
+    if (currentUrl.startsWith('/profile')) {
+      return false;
+    }
+
+     return true;
   }
 }
 

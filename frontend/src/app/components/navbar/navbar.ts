@@ -49,11 +49,23 @@ export class Navbar {
   }
 
   onSearchChange() {
+    // Ila msa7 l-ktiba b-merra
+    if (this.searchTerm.trim().length === 0) {
+      this.searchResults = [];
+      this.showDropdown = false;
+      return;
+    }
+    
     this.searchSubject.next(this.searchTerm);
   }
 
   // Bach t-ghber l-list mlli i-cliqui b-ra
   hideDropdown() {
-    setTimeout(() => this.showDropdown = false, 200);
+    setTimeout(() => this.showDropdown = false, 300);
   }
+  selectUser() {
+  this.searchTerm = '';        // Khwi l-ktiba li f l-input
+  this.searchResults = [];     // Khwi l-list dial l-users li tla3at
+  this.showDropdown = false;   // Sedd l-menu dial l-ba7t
+}
 }

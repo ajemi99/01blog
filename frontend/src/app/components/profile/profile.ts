@@ -1,23 +1,26 @@
+// profile.ts
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../../services/userService';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { PostCard } from '../post-card/post-card';
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.html',
-  styleUrl: './profile.css',
-  imports: [RouterLink,FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule,PostCard],
+  styleUrl: './profile.css'
 })
 export class Profile implements OnInit {
-  private route = inject(ActivatedRoute); // Bach n-jbdou l-URL
+  private route = inject(ActivatedRoute);
   private userService = inject(UserService);
-
-  profileData: any; // Hna ghadi t-khabba l-data jaya men l-backend
+  
+  profileData: any;
   isLoading = true;
 
   ngOnInit() {
-    // 1. "Listen" l l-URL: kollma tbeddel s-miya f l-barre d'adresse, khdem
+    // Listen l-username f l-URL
     this.route.paramMap.subscribe(params => {
       const username = params.get('username');
       if (username) {
@@ -30,15 +33,22 @@ export class Profile implements OnInit {
     this.isLoading = true;
     this.userService.getUserProfile(username).subscribe({
       next: (data) => {
-        console.log(data);
-        
         this.profileData = data;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error(err);
         this.isLoading = false;
       }
     });
+  }
+
+  // Had l-function kat-khdem mlli kadd-cliqui 3la chi post akhor
+  onCommentsOpened(postId: number) {
+    this.profileData.posts.forEach((p: any) => {
+      if (p.id !== postId) p.showComments = false;
+    });
+  }
+
+  // Mlli kadd-delete post men l-card
+  onPostDeleted(postId: number) {
+    this.profileData.posts = this.profileData.posts.filter((p: any) => p.id !== postId);
+    this.profileData.postsCount--;
   }
 }

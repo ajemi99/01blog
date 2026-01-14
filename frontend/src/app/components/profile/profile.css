@@ -1,34 +1,89 @@
-.post-container {
+/* Container dial l-page */
+.container {
+    max-width: 935px; /* Nafss l-3ard dial Instagram profile */
+}
+
+/* L-Avatar (Tswira dial l-user) */
+.rounded-circle {
+    transition: transform 0.3s ease;
     cursor: pointer;
+    border: 5px solid #fff;
 }
 
-/* L-Overlay kiy-ghtti t-swira kamla */
-.post-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Lon k7el m-dfi */
-    opacity: 0; /* M-khbi f l-lowel */
-    transition: opacity 0.3s ease; /* Animation smooth */
-    padding: 15px;
+.rounded-circle:hover {
+    transform: scale(1.02);
 }
 
-/* Mlli l-user i-hoveri 3la l-container, l-overlay kiban */
-.post-container:hover .post-overlay {
+/* Stats (Posts, Followers, Following) */
+.fs-5 span {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fs-5 span:hover {
+    color: #007bff;
+}
+
+/* Publications Grid */
+.row.g-3 {
+    margin-top: 20px;
+}
+
+/* Design dial app-post-card wast l-profile */
+app-post-card {
+    display: block;
+    margin-bottom: 25px; /* Kankhlliwa l-farq bin l-posts */
+}
+
+/* Divider (l-khatt li f l-west) */
+hr {
+    border-top: 1px solid #dbdbdb;
+    margin: 40px 0;
     opacity: 1;
 }
 
-/* Bach t-ji l-description m-rattba */
-.description-text {
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Max 3 d s-toura bach may-khrejch 3la l-card */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    font-weight: 500;
+/* Custom Buttons */
+.btn-primary {
+    background-color: #0095f6;
+    border: none;
+    font-weight: 600;
 }
 
-.object-fit-cover {
-    object-fit: cover;
+.btn-primary:hover {
+    background-color: #1877f2;
+}
+
+.btn-light.border {
+    background-color: #efefef;
+    border: 1px solid #dbdbdb !important;
+    color: #262626;
+    font-weight: 600;
+}
+
+/* User Name */
+h2 {
+    font-weight: 300;
+    font-size: 28px;
+    color: #262626;
+}
+
+/* Responsive (Mobile) */
+@media (max-width: 768px) {
+    .rounded-circle {
+        width: 80px !important;
+        height: 80px !important;
+        font-size: 2rem !important;
+    }
+    
+    h2 {
+        font-size: 22px;
+    }
+    
+    .fs-5 {
+        font-size: 0.9rem !important;
+        justify-content: space-around;
+        width: 100%;
+        border-top: 1px solid #efefef;
+        padding-top: 10px;
+    }
 }

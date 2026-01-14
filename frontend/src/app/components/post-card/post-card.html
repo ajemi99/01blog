@@ -1,0 +1,103 @@
+<div class="card border-0 shadow-sm mb-4 rounded-3">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="d-flex align-items-center">
+        <a [routerLink]="['/profile', post.authorUsername]">
+        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 42px; height: 42px; font-weight: bold;">
+          {{ post.authorUsername?.charAt(0) | uppercase }}
+        </div>
+     </a>
+        <div>
+          <h6 class="mb-0 fw-bold text-capitalize">{{ post.authorUsername }}</h6>
+          <small class="text-muted">{{ post.createdAt | date:'medium' }}</small>
+        </div>
+      </div>
+
+      <div class="dropdown">
+        <button class="btn btn-link text-secondary p-0 border-0" type="button" data-bs-toggle="dropdown">
+          <i class="bi bi-three-dots-vertical fs-5"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
+          @if (post.authorUsername === currentUser?.username) {
+            <li><button class="dropdown-item" (click)="onEditClick()"><i class="bi bi-pencil me-2"></i> Edit</button></li>
+            <li><button class="dropdown-item text-danger" (click)="onDeletePost()"><i class="bi bi-trash3 me-2"></i> Delete</button></li>
+          }
+          <li><button class="dropdown-item text-warning"><i class="bi bi-flag me-2"></i> Report</button></li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="card-text fs-6">{{ post.description }}</p>
+
+    <div class="post-media-container mt-3 mb-2 bg-light rounded border overflow-hidden">
+      @if (isImage(post.mediaUrl)) {
+        <img [src]="'http://localhost:8080' + post.mediaUrl" class="img-fluid w-100 object-fit-contain" style="max-height: 500px;" />
+      }
+      @if (isVideo(post.mediaUrl)) {
+        <video controls class="w-100 h-100 bg-black">
+          <source [src]="'http://localhost:8080' + post.mediaUrl" type="video/mp4" />
+        </video>
+      }
+    </div>
+  </div>
+
+  <div class="card-footer bg-white border-0 d-flex justify-content-around pb-3 border-top">
+    <button class="btn btn-link text-decoration-none w-50 py-2" (click)="onLike(post)" [disabled]="post.isLiking">
+      <i class="bi" [ngClass]="post.liked ? 'bi-heart-fill text-danger animate-like' : 'bi-heart text-secondary'"></i>
+      <span class="ms-2" [class.text-danger]="post.liked">{{ post.liked ? 'Liked' : 'Like' }}</span>
+      @if (post.likesCount > 0) { <span class="small text-muted">({{ post.likesCount }})</span> }
+    </button>
+    <button class="btn btn-link text-decoration-none text-secondary w-50 py-2 border-start" (click)="onToggleComments(post)">
+      <i class="bi bi-chat-left-text me-1"></i>
+      <span>Comment @if(post.commentCount > 0) { ({{post.commentCount}}) }</span>
+    </button>
+  </div>
+
+@if (post.showComments) {
+ <div class="bg-light p-3 border-top mt-2 rounded-bottom">
+  <div class="input-group mb-3 px-1">
+    <input type="text" 
+           class="form-control border-0 bg-white rounded-pill shadow-none px-3" 
+           placeholder="Écrire un commentaire..." 
+           [(ngModel)]="post.newCommentText" 
+           (keyup.enter)="onAddComment()"
+           style="font-size: 0.9rem;">
+    <button class="btn btn-link text-primary p-0 ms-2" (click)="onAddComment()">
+      <i class="bi bi-send-fill fs-5"></i>
+    </button>
+  </div>
+
+  <div class="comment-list px-1">
+    @for (comment of post.comments; track comment.id) {
+      <div class="d-flex mb-3 align-items-start position-relative comment-item">
+        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 flex-shrink-0 shadow-sm fw-bold" 
+             style="width: 32px; height: 32px; font-size: 11px;">
+          {{ comment.username.charAt(0).toUpperCase() }}
+        </div>
+
+        <div class="flex-grow-1">
+          <div class="d-flex align-items-center">
+            <div class="bg-white border shadow-sm p-2 px-3 rounded-4" style="max-width: 85%;">
+              <span class="d-block fw-bold text-dark" style="font-size: 0.8rem;">{{ comment.username }}</span>
+              <p class="mb-0 text-secondary" style="font-size: 0.9rem; line-height: 1.2;">{{ comment.content }}</p>
+            </div>
+            
+            @if (comment.username === currentUser?.username) {
+              <button class="btn btn-link btn-sm text-danger opacity-50 hover-opacity-100 p-0 ms-2" 
+                      (click)="onDeleteComment(comment.id)">
+                <i class="bi bi-trash3"></i>
+              </button>
+            }
+          </div>
+          <small class="text-muted ms-2" style="font-size: 0.7rem;">{{ comment.createdAt | date:'shortTime' }}</small>
+        </div>
+      </div>
+    } @empty {
+      <div class="text-center py-2">
+        <small class="text-muted italic">Soyez le premier à commenter...</small>
+      </div>
+    }
+  </div>
+</div>
+}
+</div>

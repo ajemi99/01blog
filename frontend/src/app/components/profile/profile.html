@@ -11,10 +11,8 @@
       <div class="d-flex align-items-center mb-3 gap-3">
         <h2 class="fw-bold mb-0">{{ profileData?.username }}</h2>
         
-        @if (profileData?.owner) {
-          <button class="btn btn-outline-dark btn-sm rounded-pill px-3">Edit Profile</button>
-        } 
-        @else {
+        @if (!profileData?.owner) {
+ 
           <button class="btn btn-sm rounded-pill px-4" 
                   [ngClass]="profileData?.isFollowing ? 'btn-light border' : 'btn-primary'">
             {{ profileData?.following ? 'Unfollow' : 'Follow' }}
@@ -32,36 +30,18 @@
 
   <hr>
 
-<div class="row g-3">
-  @for (post of profileData?.posts; track post.id) {
-    <div class="col-md-4">
-      <div class="post-container position-relative overflow-hidden rounded-3 shadow-sm">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-7">
         
-        <img [src]="'http://localhost:8080' + post.mediaUrl" 
-             class="img-fluid w-100 object-fit-cover" 
-             style="height: 300px; display: block;">
+        @for (post of profileData?.posts; track post.id) {
+            <app-post-card 
+                [post]="post" 
+                
+                (commentsOpened)="onCommentsOpened($event)"
+                (postDeleted)="onPostDeleted($event)">
+            </app-post-card>
+        }
 
-        <div class="post-overlay d-flex flex-column justify-content-center align-items-center text-white px-3 text-center">
-          
-          <div class="d-flex gap-3 mb-2">
-             <span><i class="bi bi-heart-fill me-1"></i> {{ post.likesCount || 0 }}</span>
-             <span><i class="bi bi-chat-fill me-1"></i> {{ post.commentsCount || 0 }}</span>
-          </div>
-
-          <p class="description-text small mb-0">{{ post.description }}</p>
-          
-          <small class="mt-2 opacity-75" style="font-size: 0.7rem;">
-             {{ post.createdAt | date:'mediumDate' }}
-          </small>
-        </div>
-
-      </div>
     </div>
-  } @empty {
-    <div class="col-12 text-center p-5">
-      <i class="bi bi-camera fs-1 text-muted"></i>
-      <p class="text-muted mt-2">No posts yet.</p>
-    </div>
-  }
 </div>
 </div>

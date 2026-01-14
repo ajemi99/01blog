@@ -11,12 +11,13 @@ import { PostService } from '../services/post.service';
 import { log } from 'console';
 import { LikeService } from '../services/LikeService';
 import { CommentService } from '../services/comment.service';
+import { PostCard } from '../components/post-card/post-card';
 // import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule, CommonModule, CreatePostComponent],
+  imports: [FormsModule, CommonModule, CreatePostComponent,PostCard],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -159,121 +160,123 @@ onNewPostCreated(post: any) {
   }
 }
 
-  onDelete(postId: number) {
-    if (confirm('Are you sure you want to delete this post?')) {
-      this.postService.deletePost(postId).subscribe({
-        next: () => {
-          this.posts = this.posts.filter(p => p.id !== postId);
-        },
-        error: (err) => alert('Error deleting post')
-      });
-    }
-  }
-
-    isImage(fileUrl: string | undefined): boolean {
-    if (!fileUrl) return false;
-    const ext = fileUrl.split('.').pop()?.toLowerCase();
-    return ['jpg','jpeg','png','gif'].includes(ext!);
-  }
-
-  isVideo(fileUrl: string | undefined): boolean {
-    if (!fileUrl) return false;
-    const ext = fileUrl.split('.').pop()?.toLowerCase();
-    return ['mp4','mov','webm'].includes(ext!);
-  }
-  // Function bach n-check-iw wach moul l-post
-  isOwner(post: any): boolean {
-      if (!this.currentUser || !post) return false;
-      // Kandiro l-check b s-miya (Username) kima 3ndek f l-objer
-      return post.authorUsername === this.currentUser.username;
-    }
-    onLike(post: any) {
-      // 1. Ila kante aslan isLiking kheddama, 7bess
-      if (post.isLiking) return;
-
-      // 2. Creer l-field f l-blassa w diro true
-      post.isLiking = true;
-
-      this.likeService.toggleLike(post.id).subscribe({
-        next: (res: any) => {
-          // res jay fih { "message": "liked" }
-          if (res.message === 'liked') {
-            post.liked = true;
-            post.likesCount++;
-          } else if (res.message === 'unliked') {
-            post.liked = false;
-            post.likesCount--;
-          }
-          
-          // 3. Rjje3ha false bach t-7iyyed spinner
-          post.isLiking = false;
-        },
-        error: (err) => {
-          console.error(err);
-          post.isLiking = false;
-        }
-      });
-    }
-    
-toggleComments(currentPost: any) {
-  // 1. Ila l-post kan aslan m7loum, ghir n-seddoh (Toggle normal)
-  if (currentPost.showComments) {
-    currentPost.showComments = false;
-    return;
-  }
-
-  // 2. Sedd ga3 l-comments dial ga3 l-posts khorine
+onCommentsOpened(openedPostId: number) {
+  // Dour 3la ga3 l-posts li 3ndek f l-list
   this.posts.forEach(p => {
-    if (p.id !== currentPost.id) {
-      p.showComments = false;
+    if (p.id !== openedPostId) {
+      p.showComments = false; // Sedd ay wa7ed machi houwa hada
     }
   });
-
-  // 3. 7ell l-comments dial l-post li cliquina 3lih
-  currentPost.showComments = true;
-
-  // 4. Fetch data ila kant khawya (nafs l-logic dial qbila)
-  if (!currentPost.comments) {
-    currentPost.isLoadingComments = true;
-    this.commentService.getCommentsByPost(currentPost.id).subscribe({
-      next: (res) => {
-        currentPost.comments = res;
-        currentPost.isLoadingComments = false;
-      },
-      error: () => currentPost.isLoadingComments = false
-    });
-  }
+}
+onDeleteSuccess(postId: number) {
+  // Kan-7iydu l-post men l-array bach i-ghber men l-Front
+  this.posts = this.posts.filter(p => p.id !== postId);
 }
 
-  onAddComment(post: any) {
-    if (!post.newCommentText || !post.newCommentText.trim()) return;
+  //   isImage(fileUrl: string | undefined): boolean {
+  //   if (!fileUrl) return false;
+  //   const ext = fileUrl.split('.').pop()?.toLowerCase();
+  //   return ['jpg','jpeg','png','gif'].includes(ext!);
+  // }
 
-    const request = {
-      postId: post.id,
-      content: post.newCommentText
-    };
+  // isVideo(fileUrl: string | undefined): boolean {
+  //   if (!fileUrl) return false;
+  //   const ext = fileUrl.split('.').pop()?.toLowerCase();
+  //   return ['mp4','mov','webm'].includes(ext!);
+  // }
+  // Function bach n-check-iw wach moul l-post
+  // isOwner(post: any): boolean {
+  //     if (!this.currentUser || !post) return false;
+  //     // Kandiro l-check b s-miya (Username) kima 3ndek f l-objer
+  //     return post.authorUsername === this.currentUser.username;
+  //   }
+    // onLike(post: any) {
+    //   // 1. Ila kante aslan isLiking kheddama, 7bess
+    //   if (post.isLiking) return;
 
-    this.commentService.addComment(request).subscribe({
-      next: (newComment) => {
-        if (!post.comments) post.comments = [];
-        // Zid l-comment jdid l-fouq
-        post.comments.unshift(newComment);
-        post.newCommentText = ''; // Khwi l-input
-        // Ila 3ndek commentCount f l-post, tqder t-zidou
-        if(post.commentCount !== undefined) post.commentCount++;
-      }
-    });
-  }
+    //   // 2. Creer l-field f l-blassa w diro true
+    //   post.isLiking = true;
 
-  onDeleteComment(post: any, commentId: number) {
-    if (confirm('Voulez-vous supprimer ce commentaire ?')) {
-      this.commentService.deleteComment(commentId).subscribe({
-        next: () => {
-          post.comments = post.comments.filter((c: any) => c.id !== commentId);
-          if(post.commentCount > 0) post.commentCount--;
-        }
-      });
-    }
-  }
+    //   this.likeService.toggleLike(post.id).subscribe({
+    //     next: (res: any) => {
+    //       // res jay fih { "message": "liked" }
+    //       if (res.message === 'liked') {
+    //         post.liked = true;
+    //         post.likesCount++;
+    //       } else if (res.message === 'unliked') {
+    //         post.liked = false;
+    //         post.likesCount--;
+    //       }
+          
+    //       // 3. Rjje3ha false bach t-7iyyed spinner
+    //       post.isLiking = false;
+    //     },
+    //     error: (err) => {
+    //       console.error(err);
+    //       post.isLiking = false;
+    //     }
+    //   });
+    // }
+    
+// toggleComments(currentPost: any) {
+//   // 1. Ila l-post kan aslan m7loum, ghir n-seddoh (Toggle normal)
+//   if (currentPost.showComments) {
+//     currentPost.showComments = false;
+//     return;
+//   }
+
+//   // 2. Sedd ga3 l-comments dial ga3 l-posts khorine
+//   this.posts.forEach(p => {
+//     if (p.id !== currentPost.id) {
+//       p.showComments = false;
+//     }
+//   });
+
+//   // 3. 7ell l-comments dial l-post li cliquina 3lih
+//   currentPost.showComments = true;
+
+//   // 4. Fetch data ila kant khawya (nafs l-logic dial qbila)
+//   if (!currentPost.comments) {
+//     currentPost.isLoadingComments = true;
+//     this.commentService.getCommentsByPost(currentPost.id).subscribe({
+//       next: (res) => {
+//         currentPost.comments = res;
+//         currentPost.isLoadingComments = false;
+//       },
+//       error: () => currentPost.isLoadingComments = false
+//     });
+//   }
+// }
+
+  // onAddComment(post: any) {
+  //   if (!post.newCommentText || !post.newCommentText.trim()) return;
+
+  //   const request = {
+  //     postId: post.id,
+  //     content: post.newCommentText
+  //   };
+
+  //   this.commentService.addComment(request).subscribe({
+  //     next: (newComment) => {
+  //       if (!post.comments) post.comments = [];
+  //       // Zid l-comment jdid l-fouq
+  //       post.comments.unshift(newComment);
+  //       post.newCommentText = ''; // Khwi l-input
+  //       // Ila 3ndek commentCount f l-post, tqder t-zidou
+  //       if(post.commentCount !== undefined) post.commentCount++;
+  //     }
+  //   });
+  // }
+
+  // onDeleteComment(post: any, commentId: number) {
+  //   if (confirm('Voulez-vous supprimer ce commentaire ?')) {
+  //     this.commentService.deleteComment(commentId).subscribe({
+  //       next: () => {
+  //         post.comments = post.comments.filter((c: any) => c.id !== commentId);
+  //         if(post.commentCount > 0) post.commentCount--;
+  //       }
+  //     });
+  //   }
+  // }
 
 }

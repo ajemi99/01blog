@@ -1,0 +1,28 @@
+/* Scrollbar de3ifa bach mat-khesserch l-mandar */
+.comment-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.comment-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.comment-list::-webkit-scrollbar-thumb {
+  background-color: #dee2e6;
+  border-radius: 10px;
+}
+
+/* Rounded-4 bach l-bubble t-ji m-dowra mzyan b7al Messenger */
+.rounded-4 {
+  border-radius: 1.1rem !important;
+}
+
+/* Hover effect bach l-bouton trash i-bān ghir mlli t-7et s-souris */
+.hover-opacity-100:hover {
+  opacity: 1 !important;
+}
+
+.comment-item {
+  transition: all 0.2s ease;
+}

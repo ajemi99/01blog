@@ -47,3 +47,17 @@
 .position-relative {
   position: relative;
 }
+.search-item {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.search-item:hover {
+  background-color: #f8f9fa;
+}
+
+.search-results {
+  z-index: 1050; /* Bach t-bqa dima l-fouq */
+  max-height: 300px;
+  overflow-y: auto;
+}
