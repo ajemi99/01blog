@@ -87,3 +87,21 @@ h2 {
         padding-top: 10px;
     }
 }
+/* Lon zre9 dial Instagram */
+.btn-primary {
+    background-color: #0095f6 !important;
+    border: none;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background-color: #1877f2 !important;
+}
+
+/* Lon l-byed dial Unfollow */
+.btn-light.border {
+    background-color: #ffffff !important;
+    border: 1px solid #dbdbdb !important;
+    color: #262626 !important;
+    font-weight: 600;
+}

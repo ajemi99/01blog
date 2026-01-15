@@ -1,6 +1,7 @@
 package com.ajemi.backend.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,7 @@ import com.ajemi.backend.entity.User;
 
 public interface FollowRepository extends JpaRepository<Subscription, Long>{
     boolean existsByFollowerIdAndFollowingId(Long followerId, Long followingId);
+    Optional<Subscription> findByFollowerIdAndFollowingId(Long followerId, Long followingId);
     void deleteByFollowerIdAndFollowingId(Long followerId, Long followingId);
         @Query("""
         SELECT s.following.id

@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { CreatePostComponent } from './components/create-post/create-post';
 import { Sidebar } from './components/sidebar/sidebar';
 import { AuthService } from './services/auth/auth.service';
+import { FollowService } from './services/followService';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -15,15 +17,23 @@ import { AuthService } from './services/auth/auth.service';
 })
 export class App {
   private authService = inject(AuthService);
+  private followService = inject(FollowService)
   protected readonly title = signal('frontend');
-  
+  private followSub?: Subscription;
   constructor(public router: Router) {} // Khlliha public bach t-sta3melha f HTML
 
   ngOnInit() {
     // 1. Kan-chekiw wach l-token kayn f LocalStorage s7i7
     if (this.authService.isAuthenticated()) {
       // 2. 3ad n-chargiw l-user
-      this.authService.loadCurrentUser().subscribe({
+      this.fetchSidbarData()
+     this.followSub= this.followService.followStatus$.subscribe(() => {
+         this.fetchSidbarData()// Kat-3awed t-jbed l-counts l-jdad
+    });
+    }
+  }
+  fetchSidbarData(){
+          this.authService.loadCurrentUser().subscribe({
         error: (err) => {
           console.error('Initial load failed', err);
           // Ila l-token khrbeqtih b yeddik, hada ghadi i-kharjek nichan
@@ -32,9 +42,13 @@ export class App {
           }
         }
       });
-    }
   }
-
+  // ngOnDestroy() {
+  //   if (this.followSub) {
+  //     this.followSub.unsubscribe(); // 🛑 9té3 l-khit!
+  //     console.log("Sidebar subscription closed safely.");
+  //   }
+  // }
   shouldShowNavbar(): boolean {
     const hiddenRoutes = ['/login', '/register'];
     return !hiddenRoutes.includes(this.router.url);

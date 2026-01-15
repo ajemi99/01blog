@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class UserProfileDTO {
     private String username;
+    private Long id;
     // private String bio;
     private long postsCount;
     private long followersCount;

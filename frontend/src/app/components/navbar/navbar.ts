@@ -5,6 +5,7 @@ import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth/auth.service';
+import { FollowService } from '../../services/followService';
 
 @Component({
   selector: 'app-navbar',
@@ -17,6 +18,7 @@ export class Navbar {
   searchResults: any[] = [];
   showDropdown: boolean = false;
   private userService = inject(UserService)
+  private followService = inject(FollowService)
   private searchSubject = new Subject<string>();
   currentUser: any;
   constructor(private router: Router,private authService: AuthService) {
@@ -45,6 +47,7 @@ export class Navbar {
 
   onLogout() {
     localStorage.removeItem('token');
+    this.followService.notifyFollowUpdate();
     window.location.href = '/login';
   }
 

@@ -52,7 +52,7 @@ public class UserService {
 
     UserProfileDTO dto = new UserProfileDTO();
     dto.setUsername(targetUser.getUsername());
-
+        dto.setId(targetUser.getId());
     // 2. Check: Wach hada houwa ana?
     // Ila kante l-ID dyali kat-tswa l-ID dial s-siyyd li f l-URL
     dto.setOwner(targetUser.getId().equals(currentUserId));

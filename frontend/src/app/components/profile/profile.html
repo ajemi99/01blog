@@ -13,9 +13,18 @@
         
         @if (!profileData?.owner) {
  
-          <button class="btn btn-sm rounded-pill px-4" 
-                  [ngClass]="profileData?.isFollowing ? 'btn-light border' : 'btn-primary'">
-            {{ profileData?.following ? 'Unfollow' : 'Follow' }}
+          <button (click)="onFollowToggle()" 
+                  class="btn btn-sm rounded-pill px-4 d-flex align-items-center gap-2 shadow-sm" 
+                  [ngClass]="profileData?.following ? 'btn-light border text-dark' : 'btn-primary'"
+                  [disabled]="isProcessing">
+              
+              @if (isProcessing) {
+                  <span class="spinner-border spinner-border-sm" role="status"></span>
+              } @else {
+                  <i class="bi" [ngClass]="profileData?.following ? 'bi-person-check' : 'bi-person-plus'"></i>
+                  
+                  {{ profileData?.following ? 'Unfollow' : 'Follow' }}
+              }
           </button>
         }
       </div>
