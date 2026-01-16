@@ -55,7 +55,7 @@ export class App {
   }
   
   shouldShowSidbar():boolean {
-    const hiddenRoutes = ['/login', '/register'];
+    const hiddenRoutes = ['/login', '/register','/notifications'];
     const currentUrl = this.router.url;
      if (hiddenRoutes.includes(currentUrl)) {
       return false;

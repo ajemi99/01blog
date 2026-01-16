@@ -2,6 +2,9 @@ package com.ajemi.backend.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,19 +41,22 @@ public class NotificationService {
     }
 
      // 📥 جيب notifications ديال user
-    public List<NotificationResponseDTO> getUserNotifications(User user) {
-        List<Notification> notifications = notificationRepository.findByUserOrderByCreatedAtDesc(user);
+// NotificationService.java
+public Page<NotificationResponseDTO> getUserNotifications(User user, int page, int size) {
+    // 1. Cree Pageable (page hiya r-rqem, size hiya ch-hal mn wa7da f saf7a)
+    Pageable pageable = PageRequest.of(page, size);
+    
+    // 2. Fetch data mn Repo
+    Page<Notification> notificationsPage = notificationRepository.findByUserOrderByCreatedAtDesc(user, pageable);
 
-        // 🌟 تحويل كل Notification ل DTO
-        return notifications.stream()
-                .map(n -> new NotificationResponseDTO(
-                        n.getId(),
-                        buildMessage(n),
-                        n.isRead(),
-                        n.getCreatedAt()
-                ))
-                .toList();
-    }
+    // 3. Map l-entities l DTOs wast l-Page nichan
+    return notificationsPage.map(n -> new NotificationResponseDTO(
+            n.getId(),
+            buildMessage(n),
+            n.isRead(),
+            n.getCreatedAt()
+    ));
+}
 
         // ✅ علّم notification كمقروءة
     @Transactional
@@ -72,7 +78,23 @@ public class NotificationService {
           case FOLLOW -> notification.getActor().getUsername() + " started following you";
           case LIKE -> notification.getActor().getUsername() + " liked your post";
           case COMMENT -> notification.getActor().getUsername() + " commented on your post";
-          default -> "You have a new notification";
+          case POST -> notification.getActor().getUsername() + " published a new post: ";
+         default -> "You have a new notification";
       };
     }
+
+    public Long getUnreadCount(Long receiverId){
+        return notificationRepository.countByUserIdAndReadFalse(receiverId);
+    }
+    @Transactional
+        public void markAllAsRead(User user) {
+            // 1. Jbed ga3 li ma-m9riyinch
+            List<Notification> unreadNotifications = notificationRepository.findByUserAndReadFalse(user);
+            
+            // 2. Raddhom kamlin true
+            unreadNotifications.forEach(n -> n.setRead(true));
+            
+            // 3. Save
+            notificationRepository.saveAll(unreadNotifications);
+        }
 }

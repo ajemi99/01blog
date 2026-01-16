@@ -4,6 +4,7 @@ import { Register } from './components/register/register';
 import { Home } from './home/home';
 import { authGuard } from './services/auth/auth.guard';
 import { Profile } from './components/profile/profile';
+// import { Notifications } from './pages/notifications/notifications';
 // import { MyPostsComponent } from './components/my-posts/my-posts';
 
 export const routes: Routes = [
@@ -11,6 +12,7 @@ export const routes: Routes = [
   { path: 'register', component: Register },
   { path: 'home', component: Home, canActivate: [authGuard] },
   { path: 'profile/:username', component: Profile },
+  // { path:'notifications', component:Notifications},
   // { path: 'my-posts', component: MyPostsComponent },
   // { path: 'user-posts/:id', component: MyPostsComponent },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
