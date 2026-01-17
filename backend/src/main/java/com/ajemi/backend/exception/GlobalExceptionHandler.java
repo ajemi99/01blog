@@ -76,6 +76,18 @@ public ResponseEntity<Map<String, Object>> handleApiException(ApiException ex) {
                     "message", "Le fichier est trop volumineux. La taille maximale est de 10MB."
             ));
         }
+        @ExceptionHandler(org.springframework.http.converter.HttpMessageNotWritableException.class)
+public ResponseEntity<Map<String, Object>> handleNotWritable(org.springframework.http.converter.HttpMessageNotWritableException ex) {
+    return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .header("Content-Type", "application/json") // 👈 Farḍ JSON hna
+            .body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 500,
+                    "message", "Internal Error: JSON Converter issue"
+            ));
+}
+
 
 }
 

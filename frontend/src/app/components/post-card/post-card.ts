@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommentService } from '../../services/comment.service';
 import { PostService } from '../../services/post.service';
 import { LikeService } from '../../services/LikeService';
 import { RouterLink } from '@angular/router';
+import { UserService } from '../../services/userService';
 @Component({
   selector: 'app-post-card',
   imports: [CommonModule, FormsModule,RouterLink],
@@ -16,9 +17,11 @@ export class PostCard {
   @Input() post: any;        // L-post li ghadi i-ji men l-Home aw Profile
   @Input() currentUser: any; // Bach n-عرفو isOwner dial l-comment masalan
   @Input() editComponent?: any;
+  private userService = inject(UserService)
   constructor(private postService: PostService,
     private commentService: CommentService,
-    private likeService: LikeService){}
+    private likeService: LikeService,
+  ){}
    @Output() postDeleted = new EventEmitter<number>();
    @Output() commentsOpened = new EventEmitter<number>();
 
@@ -133,6 +136,47 @@ export class PostCard {
         }
       });
     }
+  }
+
+
+// Report Variables
+  selectedPostId: number | null = null;
+  reportReason: string = '';
+  isReporting: boolean = false;
+
+  openReportModal(postId: number) {
+    console.log("Opening Modal for ID:", postId);
+    this.selectedPostId = postId;
+    this.reportReason = ''; 
+  }
+
+  submitReport() {
+    if (!this.selectedPostId || !this.reportReason.trim()) return;
+
+    this.isReporting = true;
+    this.userService.reportPost(this.selectedPostId, this.reportReason).subscribe({
+      next: (res) => {
+        console.log("Report Success:", res);
+        // alert('Report sent successfully');
+        
+        this.isReporting = false;
+        this.reportReason = '';
+
+        // 🚀 Dynamic Close
+        const closeBtn = document.getElementById('closeReportModal' + this.post.id);
+        if (closeBtn) closeBtn.click();
+      },
+      error: (err) => {
+        console.error("Report Error:", err);
+        alert(err.error?.message || 'Error sending report');
+        this.isReporting = false;
+      }
+    });
+  }
+
+  closeModal() {
+    this.selectedPostId = null;
+    this.reportReason = '';
   }
 
 }
