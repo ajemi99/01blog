@@ -57,7 +57,8 @@ public class AuthController {
                 user.getUsername(),
                 user.getEmail(),
                 followingCount,
-                followersCount
+                followersCount,
+                user.getRole().getName()
         ));
 }
 }

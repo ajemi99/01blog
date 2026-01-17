@@ -6,12 +6,12 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.ajemi.backend.dto.AdminReportResponseDTO;
+import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.Report;
 import com.ajemi.backend.entity.User;
+import com.ajemi.backend.repository.PostRepository;
 import com.ajemi.backend.repository.ReportRepository;
 import com.ajemi.backend.repository.UserRepository;
-import com.ajemi.backend.repository.PostRepository;
-import com.ajemi.backend.entity.Post;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +46,7 @@ public class ReportService {
     }
    public List<AdminReportResponseDTO> getAllReports() {
         
-    return reportRepository.findAll()
+    return reportRepository.findAllByOrderByCreatedAtDesc()
             .stream()
             .map(r -> new AdminReportResponseDTO(
                     r.getId(),

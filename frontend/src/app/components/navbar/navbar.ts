@@ -16,7 +16,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
   styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit {
-   private apiUrl = 'http://localhost:8080/api/notifications';
+  //  private apiUrl = 'http://localhost:8080/api/notifications';
   searchTerm: string = '';
   searchResults: any[] = [];
   showDropdown: boolean = false;

@@ -9,6 +9,7 @@ import com.ajemi.backend.dto.PostDTO;
 import com.ajemi.backend.dto.UserDTO;
 import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.Report;
+import com.ajemi.backend.entity.Role;
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.repository.FollowRepository;
 import com.ajemi.backend.repository.NotificationRepository;
@@ -29,7 +30,7 @@ public class AdminService {
 
     // ---------------- USERS ----------------------------------------------------------------------
         public List<UserDTO> getAllUsers() {
-        return userRepository.findAll()
+        return userRepository.findAllByRole_Name(Role.RoleName.USER)
                 .stream()
                 .map(UserDTO::new)
                 .toList();
