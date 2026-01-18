@@ -33,7 +33,7 @@ public class CommentController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody CommentRequestDTO request
     ) {
-        CommentResponseDTO response = commentService.addComment(userDetails.getId(), request);
+        CommentResponseDTO response = commentService.addComment( userDetails.getId(), request);
         return ResponseEntity.ok(response);
     }
 

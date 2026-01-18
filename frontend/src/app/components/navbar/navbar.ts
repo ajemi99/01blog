@@ -16,7 +16,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
   styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit {
-  //  private apiUrl = 'http://localhost:8080/api/notifications';
+ 
   searchTerm: string = '';
   searchResults: any[] = [];
   showDropdown: boolean = false;
@@ -66,16 +66,25 @@ export class Navbar implements OnInit {
     window.location.href = '/login';
   }
 
-  onSearchChange() {
-    // Ila msa7 l-ktiba b-merra
-    if (this.searchTerm.trim().length === 0) {
-      this.searchResults = [];
-      this.showDropdown = false;
-      return;
+    onSearchChange() {
+      if (this.searchTerm.trim().length === 0) {
+        this.searchResults = [];
+        this.showDropdown = false;
+        return;
+      }
+
+      // 🚀 Logic jdid dial l-Admin
+      if (this.router.url.includes('/admin-panel')) {
+        // Sift l-ktiba l l-URL (QueryParams)
+        this.router.navigate(['/admin-panel'], { 
+          queryParams: { search: this.searchTerm } 
+        });
+        this.showDropdown = false; // Ma-3ndna madiru b l-dropdown d users f l-admin
+      } else {
+        // Search 3adi dial l-users
+        this.searchSubject.next(this.searchTerm);
+      }
     }
-    
-    this.searchSubject.next(this.searchTerm);
-  }
 
     // Bach t-ghber l-list mlli i-cliqui b-ra
     hideDropdown() {

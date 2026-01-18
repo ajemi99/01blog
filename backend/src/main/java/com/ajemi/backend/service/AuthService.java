@@ -4,6 +4,7 @@ package com.ajemi.backend.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ajemi.backend.entity.Role;
 import com.ajemi.backend.entity.User;
@@ -11,7 +12,6 @@ import com.ajemi.backend.exception.ApiException;
 import com.ajemi.backend.repository.RoleRepository;
 import com.ajemi.backend.repository.UserRepository;
 import com.ajemi.backend.security.JwtService;
-import org.springframework.transaction.annotation.Transactional;
 
 
 
@@ -54,7 +54,7 @@ public class AuthService {
 
         userRepository.save(user);
         // token avec role
-        return jwtService.generateTokenWithRoles(username, user.getRole());
+        return jwtService.generateTokenWithDetails(username, user.getRole(),user.getId());
     }
 
     // 🔹 Login
@@ -69,7 +69,7 @@ public class AuthService {
             throw new ApiException("Votre compte est banni", HttpStatus.FORBIDDEN);
         }
 
-        return jwtService.generateTokenWithRoles(user.getUsername(), user.getRole());
+        return jwtService.generateTokenWithDetails(user.getUsername(), user.getRole(),user.getId());
     }
 }
 

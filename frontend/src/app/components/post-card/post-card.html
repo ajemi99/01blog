@@ -57,14 +57,59 @@
   <div class="card-footer bg-white border-0 d-flex justify-content-around py-2 border-top">
     <button class="btn btn-link text-decoration-none w-50 py-2" (click)="onLike(post)" [disabled]="post.isLiking">
       <i class="bi fs-5" [ngClass]="post.liked ? 'bi-heart-fill text-danger' : 'bi-heart text-secondary'"></i>
-      <span class="ms-2 fw-semibold" [class.text-danger]="post.liked">{{ post.liked ? 'Liked' : 'Like' }}</span>
+      <span class="ms-2 fw-semibold" [class.text-danger]="post.liked">
+        {{ post.likesCount }} {{ post.liked ? 'Liked' : 'Like' }}
+      </span>
     </button>
     
     <button class="btn btn-link text-decoration-none text-secondary w-50 py-2 border-start" (click)="onToggleComments(post)">
       <i class="bi bi-chat-left-text fs-5 me-2"></i>
-      <span class="fw-semibold">Comment</span>
+      <span class="fw-semibold">Comment ({{post.commentCount}})</span>
     </button>
+    
   </div>
+  @if (post.showComments) {
+    <div class="comments-section border-top bg-light p-3">
+      <div class="d-flex mb-3">
+        <input type="text" class="form-control rounded-pill px-3 shadow-none border-light-subtle" 
+               placeholder="Add a comment..." [(ngModel)]="post.newCommentText" (keyup.enter)="onAddComment()">
+        <button class="btn btn-link p-0 ms-2 text-primary shadow-none" (click)="onAddComment()" [disabled]="!post.newCommentText?.trim()">
+          <i class="bi bi-send-fill fs-5"></i>
+        </button>
+      </div>
+
+      @if (post.isLoadingComments) {
+        <div class="text-center py-2"><div class="spinner-border spinner-border-sm text-muted"></div></div>
+      }
+
+      <div class="comments-list">
+        @for (comment of post.comments; track comment.id) {
+          <div class="d-flex mb-3">
+            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2 flex-shrink-0 shadow-sm" 
+                 style="width: 35px; height: 35px; font-size: 0.8rem; font-weight: bold;">
+              {{ (comment.username || 'U').charAt(0) | uppercase }}
+            </div>
+            <div class="bg-white p-2 px-3 rounded-3 shadow-sm flex-grow-1 border">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <div>
+                  <small class="fw-bold text-dark">{{ comment.authorUsername }}</small>
+                  <small class="text-muted ms-2" style="font-size: 0.65rem;">{{ comment.createdAt | date:'short' }}</small>
+                </div>
+                @if (comment.username === currentUser?.username) {
+                  <button class="btn btn-link text-danger p-0 border-0 shadow-none" (click)="onDeleteComment(comment.id)">
+                    <i class="bi bi-trash3 small"></i>
+                  </button>
+                }
+              </div>
+              <p class="mb-0 small text-secondary">{{ comment.content }}</p>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-center text-muted small py-2">No comments yet. Be the first!</p>
+        }
+      </div>
+    </div>
+  }
 </div>
 
 <div class="modal fade" [id]="'reportModal' + post.id" tabindex="-1" aria-hidden="true">

@@ -15,7 +15,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import lombok.RequiredArgsConstructor;
 
 
@@ -50,7 +49,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             UserDetails userDetails =
                 userDetailsService.loadUserByUsername(username);
                 System.out.println("Authenticated user: " + userDetails.getUsername());
-            if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+                // 1️⃣ Cast l-userDetails l l-implémentation dyalk bach n-jebdo l-ID mn l-DB
+                UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
+                
+                // 2️⃣ Jbed l-ID li m-khbi wast l-Token (khass t-koun zedtih f l-claims mlli katcharger l-token)
+                Long tokenId = jwtService.extractClaim(jwt, claims -> claims.get("userId", Long.class));
+            if (jwtService.isTokenValid(jwt, userDetails.getUsername()) && userDetails.isAccountNonLocked()&&
+                    tokenId != null && tokenId.equals(userDetailsImpl.getId())) {
 
                 UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
@@ -66,6 +71,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext()
                     .setAuthentication(authToken);
+            }else {
+                // Ila wa7ed f hado ghalat, SecurityContext kiy-bqa khawi -> Error 403 automatiqument
+                 System.out.println("Invalid Token or User ID mismatch!");
             }
         }
 

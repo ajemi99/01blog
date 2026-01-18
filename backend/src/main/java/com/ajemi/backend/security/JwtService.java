@@ -1,20 +1,20 @@
 package com.ajemi.backend.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.ajemi.backend.entity.Role;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
@@ -37,8 +37,9 @@ public class JwtService {
     public String generateToken(String username) {
         return generateToken(Map.of(), username);
     }
-    public String generateTokenWithRoles(String username, Role role) {
-        Map<String, Object> claims = Map.of("role", role.getName().toString());
+    public String generateTokenWithDetails(String username, Role role, Long userId) {
+        Map<String, Object> claims = Map.of("role", role.getName().toString(),
+    "userId", userId);
         return generateToken(claims, username);
     }
     public String generateToken(Map<String, Object> extraClaims, String username) {

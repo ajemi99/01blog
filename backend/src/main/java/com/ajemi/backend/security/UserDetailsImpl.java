@@ -32,8 +32,19 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override public String getPassword() { return user.getPassword(); }
     @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
+    // @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+    // @Override public boolean isEnabled() { return true; }
+    @Override 
+public boolean isAccountNonLocked() { 
+    // Ila kān banned == true, khass accountNonLocked t-koun false
+    return !user.isBanned(); 
+}
+
+@Override 
+public boolean isEnabled() { 
+    // Ila kān banned, n-qdro n-7sbouh b-elli l-compte m-sedd (Disabled)
+    return !user.isBanned(); 
+}
 }
 

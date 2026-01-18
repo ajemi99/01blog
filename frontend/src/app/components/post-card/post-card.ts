@@ -100,6 +100,8 @@ export class PostCard {
     currentPost.isLoadingComments = true;
     this.commentService.getCommentsByPost(currentPost.id).subscribe({
       next: (res) => {
+        console.log(res);
+        
         currentPost.comments = res;
         currentPost.isLoadingComments = false;
       },

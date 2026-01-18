@@ -55,12 +55,15 @@ export class App {
   }
   
   shouldShowSidbar():boolean {
-    const hiddenRoutes = ['/login', '/register','/notifications','/admin-panel'];
+    const hiddenRoutes = ['/login', '/register','/notifications'];
     const currentUrl = this.router.url;
      if (hiddenRoutes.includes(currentUrl)) {
       return false;
     }
     if (currentUrl.startsWith('/profile')) {
+      return false;
+    }
+    if (currentUrl.startsWith('/admin-panel')){
       return false;
     }
 
