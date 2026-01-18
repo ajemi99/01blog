@@ -14,21 +14,24 @@ import { AuthService } from '../../services/auth/auth.service';
 export class Register {
   private authService = inject(AuthService);
   private router = inject(Router);
+  
   errorMessage: string | null = null;
 
-  constructor() {}
-onRegister(form: NgForm) {
-  this.authService.register(form.value).subscribe({
-    next: (res:any) => {
-      // this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
-          if (res.token) {
-            this.errorMessage = null;
-            this.router.navigate(['/home']); // صيفطو للصفحة الرئيسية بعد النجاح
-          }
-    },
-    error: (err) => {
-      this.errorMessage = err.error.message; // "Email already registered"
-    }
-  });
-}
+  onRegister(form: NgForm) {
+    this.authService.register(form.value).subscribe({
+      next: (res: any) => {
+        if (res.token) {
+          this.errorMessage = null;
+          this.router.navigate(['/home']);
+        }
+      },
+      error: (err) => {
+        // 1. Ila kān mouchkil dial Validation (400)
+        if (err.status === 400) {
+         
+          this.errorMessage = err.error?.message || "Une erreur est survenue.";
+        }
+      }
+    });
+  }
 }

@@ -45,9 +45,10 @@
         @for (post of profileData?.posts; track post.id) {
             <app-post-card 
                 [post]="post" 
-                
+                [currentUser]="profileData"
                 (commentsOpened)="onCommentsOpened($event)"
-                (postDeleted)="onPostDeleted($event)">
+                (postDeleted)="onPostDeleted($event)"
+                >
             </app-post-card>
         }
 

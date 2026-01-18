@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CreatePostComponent } from '../components/create-post/create-post';
 import { PostService } from '../services/post.service';
 import { PostCard } from '../components/post-card/post-card';
+import { UserService } from '../services/userService';
 
 
 @Component({
@@ -18,12 +19,12 @@ export class Home implements OnInit {
 
       posts: any[] = [];
       private postService = inject(PostService)
-      private  authService = inject(AuthService)
+      private  userService = inject(UserService)
       currentUser: any;
       constructor() {}
       
       ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
+    this.userService  .currentUser$.subscribe(user => {
       this.currentUser = user;
       console.log(this.currentUser);
       

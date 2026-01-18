@@ -37,10 +37,17 @@ export class Login {
             this.router.navigate(['/home']); // صيفطو للصفحة الرئيسية بعد النجاح
           }
         },
-       error: (err) => {
-      // Hna fin kan-capturiw l-ghalat
-      this.errorMessage = err.error.message || "Une erreur est survenue";
-    }
+        error: (err) => {
+          if (err.status === 401) {
+            // Hadi dial password/identifier ghalat
+            this.errorMessage = "Identifiants incorrects. Veuillez réessayer.";
+          } else if (err.status === 403) {
+            // Hadi dial l-banni (l-message ghadi i-ji mn l-Back: "Votre compte est banni")
+            this.errorMessage = err.error?.message || "Accès refusé.";
+          } else {
+            this.errorMessage = "Une erreur technique est survenue.";
+          }
+        }
       });
     }
   }

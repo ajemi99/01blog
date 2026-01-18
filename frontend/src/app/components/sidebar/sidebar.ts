@@ -3,6 +3,7 @@ import { Component, inject, OnInit,OnDestroy } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { UserService } from '../../services/userService';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -12,12 +13,14 @@ import { Subscription } from 'rxjs';
 })
 export class Sidebar implements OnInit, OnDestroy {
  public user: any;
-  private authService = inject(AuthService)
+  private userService = inject(UserService)
   private userSub!: Subscription;
   constructor() {}
 
   ngOnInit() {
-  this.userSub = this.authService.currentUser$.subscribe(userData => {
+  this.userSub = this.userService.currentUser$.subscribe(userData => {
+    console.log(userData);
+    
       this.user = userData;
     });
   }

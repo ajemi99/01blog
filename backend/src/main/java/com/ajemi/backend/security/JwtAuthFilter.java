@@ -79,5 +79,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+        @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        System.err.println(path);
+        // 🚩 Goul l-Spring mat-khdemch had l-Filter f had l-blayss
+        return path.startsWith("/api/auth/") || path.startsWith("/uploads/");
+    }
 }
 

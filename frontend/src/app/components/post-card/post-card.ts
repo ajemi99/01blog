@@ -6,6 +6,7 @@ import { PostService } from '../../services/post.service';
 import { LikeService } from '../../services/LikeService';
 import { RouterLink } from '@angular/router';
 import { UserService } from '../../services/userService';
+import { AuthService } from '../../services/auth/auth.service';
 @Component({
   selector: 'app-post-card',
   imports: [CommonModule, FormsModule,RouterLink],
@@ -24,7 +25,9 @@ export class PostCard {
   ){}
    @Output() postDeleted = new EventEmitter<number>();
    @Output() commentsOpened = new EventEmitter<number>();
-
+  get authenticatedUser() {
+    return this.userService.currentUserValue;
+  }
   onDeletePost() {
     if (confirm('Voulez-vous vraiment supprimer ce post ?')) {
       this.postService.deletePost(this.post.id).subscribe({

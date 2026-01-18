@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ajemi.backend.dto.InfoDto;
 import com.ajemi.backend.dto.UserProfileDTO;
 import com.ajemi.backend.dto.UserSearchDTO;
 import com.ajemi.backend.security.UserDetailsImpl;
 import com.ajemi.backend.service.UserService;
-
 
 
 @RestController
@@ -26,6 +26,7 @@ public class UserController{
 
     public UserController(UserService userService){
         this.userService = userService;
+
     }
     @GetMapping("/search")
     public List<UserSearchDTO> search( @RequestParam String query,@AuthenticationPrincipal UserDetailsImpl userDetails){
@@ -38,6 +39,11 @@ public class UserController{
     ) {
         return ResponseEntity.ok(userService.getUserProfile(username, userDetails.getId()));
     }
-    
+       @GetMapping("/me")
+    public ResponseEntity<InfoDto> getCurrentUser( @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long userId = userDetails.getId();
+        InfoDto infoDto = userService.getCurrentUser(userId);
+        return ResponseEntity.ok(infoDto);
+}
 }
 

@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, BehaviorSubject, Observable, tap } from 'rxjs';
 import { FollowService } from '../followService';
+import { UserService } from '../userService';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -9,23 +10,12 @@ export class AuthService {
   private readonly tokenKey = 'token';
   private http = inject(HttpClient);
   private followService = inject(FollowService);
+  private userService = inject(UserService)
   currentUser: any = null;
-  private userSubject = new BehaviorSubject<any>(null);
-  public currentUser$ = this.userSubject.asObservable();
+
   constructor() {
   }
-  // 3. Had l-function t-3eyet liha ghir mra wa7da f app.component
-  loadCurrentUser(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/me`).pipe(
-      tap(user => {
-        this.userSubject.next(user); // Khzen l-user f l-khzana
-      })
-    );
-  }
-  // Helper bach tjib l-user bla subscribe (ila bghiti ghir l-valeur d l-7da)
-  get currentUserValue() {
-    return this.userSubject.value;
-  }
+
   get token(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
@@ -41,7 +31,7 @@ login(credentials: any): Observable<any> {
         // 1. Darouri t-khzen l-token houwa l-lowel bach l-Interceptor y-lqah
        this.saveToken(response.token) ;
        // 2. 3ad t-3lem l-app t-loadi l-user jdid
-      this.loadCurrentUser().subscribe({
+      this.userService.loadCurrentUser().subscribe({
           next: (user) => {
             console.log("User loaded successfully:", user);
             // 3. 3ad 3lam l-app b l-update
@@ -59,7 +49,7 @@ login(credentials: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/register`, credentials).pipe(
       tap(response =>{
         this.saveToken(response.token);
-        this.loadCurrentUser().subscribe();
+        this.userService.loadCurrentUser().subscribe();
       })
     )
   }

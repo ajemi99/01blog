@@ -7,6 +7,7 @@ import { Sidebar } from './components/sidebar/sidebar';
 import { AuthService } from './services/auth/auth.service';
 import { FollowService } from './services/followService';
 import { Subscription } from 'rxjs';
+import { UserService } from './services/userService';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ import { Subscription } from 'rxjs';
 })
 export class App {
   private authService = inject(AuthService);
+   private userService = inject(UserService);
   private followService = inject(FollowService)
   protected readonly title = signal('frontend');
   private followSub?: Subscription;
@@ -33,12 +35,12 @@ export class App {
     }
   }
   fetchSidbarData(){
-          this.authService.loadCurrentUser().subscribe({
+          this.userService.loadCurrentUser().subscribe({
         error: (err) => {
           console.error('Initial load failed', err);
           // Ila l-token khrbeqtih b yeddik, hada ghadi i-kharjek nichan
           if (err.status === 403 || err.status === 401 || err.status === 500) {
-            this.authService.logout();
+             this.authService.logout();
           }
         }
       });

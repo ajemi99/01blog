@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.ajemi.backend.dto.InfoDto;
 import com.ajemi.backend.dto.UserProfileDTO;
 import com.ajemi.backend.dto.UserSearchDTO;
 import com.ajemi.backend.entity.Post;
@@ -45,40 +46,53 @@ public class UserService {
         return dto;
         }).toList();
     }
-    public UserProfileDTO getUserProfile(String username, Long currentUserId) {
-    // 1. Jbed l-user men l-DB b s-smiya
-    User targetUser = userRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        public UserProfileDTO getUserProfile(String username, Long currentUserId) {
+        // 1. Jbed l-user men l-DB b s-smiya
+        User targetUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    UserProfileDTO dto = new UserProfileDTO();
-    dto.setUsername(targetUser.getUsername());
-        dto.setId(targetUser.getId());
-    // 2. Check: Wach hada houwa ana?
-    // Ila kante l-ID dyali kat-tswa l-ID dial s-siyyd li f l-URL
-    dto.setOwner(targetUser.getId().equals(currentUserId));
+        UserProfileDTO dto = new UserProfileDTO();
+        dto.setUsername(targetUser.getUsername());
+            dto.setId(targetUser.getId());
+        // 2. Check: Wach hada houwa ana?
+        // Ila kante l-ID dyali kat-tswa l-ID dial s-siyyd li f l-URL
+        dto.setOwner(targetUser.getId().equals(currentUserId));
 
-    // 3. Check: Wach m-followih? (Ghir ila kante machi owner)
-    if (!dto.isOwner()) {
-        boolean following = followRepository.existsByFollowerIdAndFollowingId(currentUserId, targetUser.getId());
-        dto.setFollowing(following);
+        // 3. Check: Wach m-followih? (Ghir ila kante machi owner)
+        if (!dto.isOwner()) {
+            boolean following = followRepository.existsByFollowerIdAndFollowingId(currentUserId, targetUser.getId());
+            dto.setFollowing(following);
+        }
+
+        // 4. Jbed counts (N-t-khaylou 3ndek had l-methat f repositories)
+        dto.setPostsCount(postRepository.countByAuthor_Id(targetUser.getId()));
+        dto.setFollowersCount(followRepository.countFollowers(targetUser.getId()));
+        dto.setFollowingCount(followRepository.countFollowing(targetUser.getId()));
+
+        // 5. Jbed l-posts dialu
+    List<Post> posts =
+            postRepository.findByAuthor_IdOrderByCreatedAtDesc(targetUser.getId());
+
+        dto.setPosts(
+            posts.stream()
+                .map((Post post) -> postService.mapToDTO(post, targetUser.getUsername()))
+                .collect(Collectors.toList())
+        );
+
+
+        return dto;
     }
-
-    // 4. Jbed counts (N-t-khaylou 3ndek had l-methat f repositories)
-    dto.setPostsCount(postRepository.countByAuthor_Id(targetUser.getId()));
-    dto.setFollowersCount(followRepository.countFollowers(targetUser.getId()));
-    dto.setFollowingCount(followRepository.countFollowing(targetUser.getId()));
-
-    // 5. Jbed l-posts dialu
-  List<Post> posts =
-        postRepository.findByAuthor_IdOrderByCreatedAtDesc(targetUser.getId());
-
-    dto.setPosts(
-        posts.stream()
-            .map((Post post) -> postService.mapToDTO(post, targetUser.getUsername()))
-            .collect(Collectors.toList())
-    );
-
-
-    return dto;
-}
+    public InfoDto getCurrentUser(Long userId){
+        User user = this.findUser(userId);
+        Long followersCount = followRepository.countFollowers(userId);
+        Long followingCount = followRepository.countFollowing(userId);
+        return new InfoDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                followingCount,
+                followersCount,
+                user.getRole().getName()
+        );
+    }
 }

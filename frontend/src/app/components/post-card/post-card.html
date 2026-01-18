@@ -21,7 +21,7 @@
           <i class="bi bi-three-dots-vertical fs-5"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 p-2 rounded-3">
-          @if (post.authorUsername === currentUser?.username) {
+         @if (post.authorUsername === authenticatedUser?.username) {
             <li><button class="dropdown-item rounded-2" (click)="onEditClick()"><i class="bi bi-pencil me-2"></i> Edit</button></li>
             <li><button class="dropdown-item rounded-2 text-danger" (click)="onDeletePost()"><i class="bi bi-trash3 me-2"></i> Delete</button></li>
           } @else {
@@ -58,13 +58,13 @@
     <button class="btn btn-link text-decoration-none w-50 py-2" (click)="onLike(post)" [disabled]="post.isLiking">
       <i class="bi fs-5" [ngClass]="post.liked ? 'bi-heart-fill text-danger' : 'bi-heart text-secondary'"></i>
       <span class="ms-2 fw-semibold" [class.text-danger]="post.liked">
-        {{ post.likesCount }} {{ post.liked ? 'Liked' : 'Like' }}
+        {{ post.likesCount > 0 ? post.likesCount : '' }} {{ post.liked ? 'Liked' : 'Like' }}
       </span>
     </button>
     
     <button class="btn btn-link text-decoration-none text-secondary w-50 py-2 border-start" (click)="onToggleComments(post)">
       <i class="bi bi-chat-left-text fs-5 me-2"></i>
-      <span class="fw-semibold">Comment ({{post.commentCount}})</span>
+      <span class="fw-semibold">Comment {{post.commentCount > 0 ? post.commentCount:''}}</span>
     </button>
     
   </div>
@@ -92,10 +92,10 @@
             <div class="bg-white p-2 px-3 rounded-3 shadow-sm flex-grow-1 border">
               <div class="d-flex justify-content-between align-items-center mb-1">
                 <div>
-                  <small class="fw-bold text-dark">{{ comment.authorUsername }}</small>
+                  <small class="fw-bold text-dark">{{ comment.username }}</small>
                   <small class="text-muted ms-2" style="font-size: 0.65rem;">{{ comment.createdAt | date:'short' }}</small>
                 </div>
-                @if (comment.username === currentUser?.username) {
+                @if (comment.username === authenticatedUser?.username ) {
                   <button class="btn btn-link text-danger p-0 border-0 shadow-none" (click)="onDeleteComment(comment.id)">
                     <i class="bi bi-trash3 small"></i>
                   </button>
