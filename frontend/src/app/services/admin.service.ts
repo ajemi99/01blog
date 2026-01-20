@@ -7,6 +7,7 @@ export interface ReportResponse{
     reason: string;
     reporterUsername: string;
     reportedUsername: string;
+    reportedUserRole:string;
     postId: number;
     createdAt: string;
 

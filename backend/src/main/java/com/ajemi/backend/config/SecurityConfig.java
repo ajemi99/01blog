@@ -58,6 +58,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers("/api/auth/**", "/api/test").permitAll()
+            .requestMatchers("/api/users/profile/**").authenticated()
             .requestMatchers("/uploads/**").permitAll() 
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .anyRequest().authenticated()

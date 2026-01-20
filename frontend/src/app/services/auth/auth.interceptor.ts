@@ -28,7 +28,10 @@ export class AuthInterceptor implements HttpInterceptor {
             if ((error.status === 401 || error.status === 403) && !isAuthRequest) {
                 console.warn('Invalid Token! Redirecting...');
                 localStorage.removeItem('token');
-                window.location.href = '/login'; 
+                        // 🚩 Sift l-user l l-Login w zid lih "error=banned" f l-URL
+                this.router.navigate(['/login'], { 
+                    queryParams: { error: 'banned' } 
+                });
             }
             
             // 3. DAROURI: rjje3 l-error (throwError) bach t-wesal l-Login Component

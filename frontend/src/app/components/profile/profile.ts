@@ -1,6 +1,6 @@
 // profile.ts
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../services/userService';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -18,7 +18,7 @@ export class Profile implements OnInit {
   private route = inject(ActivatedRoute);
   private userService = inject(UserService);
   private followService = inject(FollowService)
-  constructor(private http: HttpClient){}
+  constructor(private http: HttpClient,private router :Router){}
   profileData: any;
   isLoading = true;
   isProcessing = false;
@@ -41,7 +41,14 @@ export class Profile implements OnInit {
         console.log(this.profileData);
         
         this.isLoading = false;
+      },
+      error: (err) => {
+      if (err.status === 404) {
+        // 🚩 Ila user makaynach, siftou l-page 404 nichan
+        console.warn('User not found, redirecting to 404...');
+        this.router.navigate(['/404'], { skipLocationChange: true });
       }
+    }
     });
   }
 

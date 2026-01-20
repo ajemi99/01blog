@@ -1,9 +1,8 @@
 package com.ajemi.backend.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,9 @@ import com.ajemi.backend.dto.PostResponseDTO;
 import com.ajemi.backend.entity.Notification.NotificationType;
 import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.User;
+import com.ajemi.backend.exception.ApiException;
 import com.ajemi.backend.repository.FollowRepository;
+import com.ajemi.backend.repository.LikeRepository;
 import com.ajemi.backend.repository.PostRepository;
 import com.ajemi.backend.repository.UserRepository;
 
@@ -29,6 +30,7 @@ public class PostService {
     private final FileStorageService fileStorageService;
     private final FollowRepository followRepository;
     private final NotificationService notificationService;
+    private final LikeRepository likeRepository;
     // ===============================
     // Create a new post
     // ===============================
@@ -36,7 +38,10 @@ public class PostService {
     public PostResponseDTO createPost(String username, String description, MultipartFile file) {
         // 1️⃣ Get user from DB
         User actor = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+               .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
+         if (actor.isBanned()) {
+            throw new ApiException("Your account is suspended. You cannot post.", HttpStatus.FORBIDDEN);
+        }
 
         // 2️⃣ Store media file (image/video)
         String mediaUrl = fileStorageService.saveFile(file);
@@ -59,27 +64,9 @@ public class PostService {
     }
 
     // ===============================
-    // Get all posts (feed)
-    // ===============================
-// @Transactional(readOnly = true)
-// public List<PostResponseDTO> getAllPostsForAdmin(String adminUsername) {
-//     // 1️⃣ Get admin user from DB
-//     User admin = userRepository.findByUsername(adminUsername)
-//             .orElseThrow(() -> new RuntimeException("User not found"));
-
-//     // 2️⃣ Get all posts ordered by creation date
-//     return postRepository.findAllByOrderByCreatedAtDesc()
-//             .stream()
-//             .map(post -> mapToDTO(post, adminUsername))
-//             .toList();
-// }
-
-
-
-    // ===============================
     // Convert Post entity to DTO
     // ===============================
-   public  PostResponseDTO mapToDTO(Post post, String currentUsername) {
+public PostResponseDTO mapToDTO(Post post, String currentUsername) {
     PostResponseDTO dto = new PostResponseDTO();
     dto.setId(post.getId());
     dto.setDescription(post.getDescription());
@@ -89,13 +76,17 @@ public class PostService {
     dto.setAuthorId(post.getAuthor().getId());
     dto.setUpdatedAt(post.getUpdatedAt());
 
-    // عدد likes
+    // 🚀 counts ghadi i-welliw khfif b-sabab @BatchSize li derna f l-Entity
     dto.setLikesCount(post.getLikes().size());
     dto.setCommentCount(post.getComments().size());
-    // واش user دار like
-    boolean liked = post.getLikes().stream()
-            .anyMatch(like -> like.getUser().getUsername().equals(currentUsername));
-    dto.setLiked(liked);
+
+    // 🚩 Check nichan mn d-Database bla loop dyal stream().anyMatch()
+    // Had l-methode a7san mn streams hit kadd-dir "EXISTS" f SQL (khfifa)
+    if (currentUsername != null) {
+        dto.setLiked(likeRepository.existsByPostIdAndUserUsername(post.getId(), currentUsername));
+    } else {
+        dto.setLiked(false);
+    }
 
     return dto;
 }
@@ -104,15 +95,20 @@ public class PostService {
     public void deletePost(@NonNull Long id, String username) {
 
     Post post = postRepository.findById( id)
-            .orElseThrow(() -> new RuntimeException("Post not found"));
+            .orElseThrow(() -> new ApiException("Post not found", HttpStatus.NOT_FOUND));
         if (!post.getAuthor().getUsername().equals(username)) {
-            throw new RuntimeException("Unauthorized");
+           throw new ApiException("You don't have permission to modify this post", HttpStatus.FORBIDDEN);
         }
-    // احذف الملف إذا كان موجود
-        fileStorageService.deleteFile(post.getMediaUrl());
+    // 🚩 1. Khbi smiya dial l-file qbel ma t-msa7 l-post
+        String fileToDelete = post.getMediaUrl();
 
-    // حذف البوست من قاعدة البيانات
-    postRepository.delete(post);
+        // 🚩 2. Msa7 mn d-Database hya l-lowla
+        postRepository.delete(post);
+
+        // 🚩 3. Ila dāzt DB bla machakil, 3ad msa7 l-file mn l-disk
+        if (fileToDelete != null) {
+            fileStorageService.deleteFile(fileToDelete);
+        }
 }
 // ===============================
 // Update Post (description + optional file)
@@ -122,10 +118,10 @@ public PostResponseDTO updatePost(@NonNull Long id, String username,  String new
 
     // 1️⃣ جيب البوست من DB
     Post post = postRepository.findById( id)
-            .orElseThrow(() -> new RuntimeException("Post not found"));
+            .orElseThrow(() ->  new ApiException("Post not found", HttpStatus.NOT_FOUND));
 
         if (!post.getAuthor().getUsername().equals(username)) {
-            throw new RuntimeException("Unauthorized");
+            throw new ApiException("You don't have permission to modify this post", HttpStatus.FORBIDDEN);
         }
     // 2️⃣ Update description فقط إلا كانت ماشي null
     if (newDescription != null  && !newDescription.isBlank()) {
@@ -152,30 +148,26 @@ public PostResponseDTO updatePost(@NonNull Long id, String username,  String new
     return mapToDTO(updated,username);
 }
 
-
-@Transactional(readOnly = true)
-public List<PostResponseDTO> getMyPosts(Long authorId, String username) {
-    List<Post> posts = postRepository.findByAuthor_IdOrderByCreatedAtDesc(authorId);
-    return posts.stream()
-                .map(post -> mapToDTO(post, username))
-                .collect(Collectors.toList());
-}
 @Transactional(readOnly = true)
 public List<PostResponseDTO> getFeed(Authentication authentication) {
-
+    // 1. Jbed smiya dial l-user li m-login
     String username = authentication.getName();
 
+    // 2. Jbed l-user mn DB (bach n-t-akkdo rah mzyan)
     User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
 
-    List<Long> followingIds = new ArrayList<>(
-            followRepository.findFollowingIds(user.getId())
-    );
+    // 3. Jbed l-IDs dial nass li m-followihom
+    List<Long> followingIds = followRepository.findFollowingIds(user.getId());
+    
+    // 4. Zid l-ID dyalk bach tchouf 7ta posts dyalk f l-Feed
     followingIds.add(user.getId());
 
-    return postRepository
-            .findAllByAuthor_IdInOrderByCreatedAtDesc(followingIds)
-            .stream()
+    // 5. Jbed l-posts kāmline dial l-feed m-rattbin mn l-jdid l-qdim
+    List<Post> posts = postRepository.findAllByAuthor_IdInOrderByCreatedAtDesc(followingIds);
+
+    // 6. Map l DTO (mapToDTO dabba kadd-dir l-check dial liked rāsha)
+    return posts.stream()
             .map(post -> mapToDTO(post, username))
             .toList();
 }

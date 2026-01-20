@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet,Router } from '@angular/router';
+import { RouterOutlet,Router,ActivatedRoute  } from '@angular/router';
 import { Navbar } from './components/navbar/navbar'; 
 import { CommonModule } from '@angular/common';
 import { CreatePostComponent } from './components/create-post/create-post';
@@ -22,7 +22,7 @@ export class App {
   private followService = inject(FollowService)
   protected readonly title = signal('frontend');
   private followSub?: Subscription;
-  constructor(public router: Router) {} // Khlliha public bach t-sta3melha f HTML
+  constructor(public router: Router, private route: ActivatedRoute) {} // Khlliha public bach t-sta3melha f HTML
 
   ngOnInit() {
     // 1. Kan-chekiw wach l-token kayn f LocalStorage s7i7
@@ -51,25 +51,22 @@ export class App {
   //     console.log("Sidebar subscription closed safely.");
   //   }
   // }
-  shouldShowNavbar(): boolean {
-    const hiddenRoutes = ['/login', '/register'];
-    return !hiddenRoutes.includes(this.router.url);
-  }
-  
-  shouldShowSidbar():boolean {
-    const hiddenRoutes = ['/login', '/register','/notifications'];
-    const currentUrl = this.router.url;
-     if (hiddenRoutes.includes(currentUrl)) {
-      return false;
+    private getCurrentRouteData() {
+      let currentRoute = this.route;
+      while (currentRoute.firstChild) {
+        currentRoute = currentRoute.firstChild;
+      }
+      return currentRoute.snapshot.data || {};
     }
-    if (currentUrl.startsWith('/profile')) {
-      return false;
-    }
-    if (currentUrl.startsWith('/admin-panel')){
-      return false;
+    shouldShowNavbar(): boolean {
+      const data = this.getCurrentRouteData();
+      return !data['hideLayout'];
     }
 
-     return true;
-  }
+    shouldShowSidbar(): boolean {
+      const data = this.getCurrentRouteData();
+      return !data['hideLayout'] && !data['hideSidebar'];
+    }
+
 }
 

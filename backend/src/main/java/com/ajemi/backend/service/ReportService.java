@@ -53,6 +53,7 @@ public class ReportService {
                     r.getReason(),
                     r.getReporter().getUsername(),
                     r.getReportedUser().getUsername(),
+                    r.getReportedUser().getRole().getName().name(),
                     r.getPost() != null ? r.getPost().getId() : null,
                     r.getCreatedAt()
             ))

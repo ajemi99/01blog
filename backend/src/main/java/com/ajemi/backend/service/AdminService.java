@@ -86,44 +86,56 @@ public class AdminService {
         }
 
  // ---------------- REPORTS ------------------------------------------------------------------------
-       @Transactional
- public void handleReport(Long reportId, String action) {
-        Report report = reportRepository.findById(reportId) 
-                .orElseThrow(() -> new RuntimeException("Report not found"));
+   @Transactional
+public void handleReport(Long reportId, String action) {
+    Report report = reportRepository.findById(reportId) 
+            .orElseThrow(() -> new RuntimeException("Report not found"));
 
-                if(report.getPost() == null) {
-                    throw new RuntimeException("Report has no post to delete");
-                }
-        switch (action.toLowerCase()) {
-            case "delete_post" -> {
-                if (report.getPost() != null) {
-                    deletePost(report.getPost().getId());
-                }
+    User reportedUser = report.getReportedUser();
+    if (reportedUser == null) {
+        throw new RuntimeException("Reported user not found");
+    }
+
+    // 🚩 Logic d-protection: Ila l-reported user Admin, ma-ndiro walou f l-Ban/Delete
+    boolean isTargetAdmin = reportedUser.getRole().getName().equals(Role.RoleName.ADMIN);
+
+    switch (action.toLowerCase()) {
+        case "delete_post" -> {
+            if (report.getPost() != null) {
+                deletePost(report.getPost().getId());
             }
-            case "ban_user" -> {
-                User user = report.getReportedUser();
-                if(user == null) {
-                    throw new RuntimeException("Reported user not found");
-                }
-                user.setBanned(true); // خاصك boolean banned ف User
-            }
-            case "delete_user" -> {
-                deleteUser(report.getReportedUser().getId());
-            }
-            default -> throw new RuntimeException("Unknown action");
         }
-
-        reportRepository.delete(report); // نحيدو report من بعد المعالجة
+        case "ban_user" -> {
+            if (isTargetAdmin) {
+                throw new RuntimeException("Moussta7il t-banni Admin!");
+            }
+            reportedUser.setBanned(true);
+        }
+        case "delete_user" -> {
+            if (isTargetAdmin) {
+                throw new RuntimeException("Moussta7il t-msa7 Admin!");
+            }
+            deleteUser(reportedUser.getId());
+        }
+        default -> throw new RuntimeException("Unknown action");
     }
 
+    reportRepository.delete(report); 
+}
     //----------------------------------ban/unbann--------------------------------------------------
-    @Transactional
-    public void banUser(Long userId) {
-     User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-     user.setBanned(true);
-        userRepository.save(user);
-    }
+        @Transactional
+        public void banUser(Long userId) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            // 🚩 Protection hna darouriya
+            if (user.getRole().getName().equals(Role.RoleName.ADMIN)) {
+                throw new RuntimeException("Impossible de bannir un administrateur");
+            }
+
+            user.setBanned(true);
+            userRepository.save(user);
+        }
 
     @Transactional
     public void unbanUser(Long userId) {

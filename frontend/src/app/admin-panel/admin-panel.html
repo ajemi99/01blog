@@ -60,9 +60,14 @@
               <button class="btn btn-sm btn-outline-danger" (click)="handleAction(report.id, 'delete_post')">
                 <i class="bi bi-trash"></i> Delete Post
               </button>
-              <button class="btn btn-sm btn-outline-dark" (click)="handleAction(report.id, 'ban_user')">
-                <i class="bi bi-slash-circle"></i> Ban
-              </button>
+             
+            @if (report.reportedUserRole !== 'ADMIN') {
+                      <button class="btn btn-sm btn-outline-dark" (click)="handleAction(report.id, 'ban_user')">
+                        <i class="bi bi-slash-circle"></i> Ban
+                      </button>
+                    } @else {
+                      <span class="badge bg-secondary ms-2 align-self-center">Admin Protected</span>
+                    }
             </div>
           </td>
         </tr>

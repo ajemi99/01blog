@@ -3,7 +3,7 @@ package com.ajemi.backend.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.ajemi.backend.dto.InfoDto;
@@ -11,6 +11,7 @@ import com.ajemi.backend.dto.UserProfileDTO;
 import com.ajemi.backend.dto.UserSearchDTO;
 import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.User;
+import com.ajemi.backend.exception.ApiException;
 import com.ajemi.backend.repository.FollowRepository;
 import com.ajemi.backend.repository.PostRepository;
 import com.ajemi.backend.repository.UserRepository;
@@ -26,37 +27,49 @@ public class UserService {
     private final PostRepository postRepository;
     private final PostService postService;
 
-     public User findUser(long  userId) {
+    public User findUser(long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
     }
 
-    public List<UserSearchDTO> searchUsers(String username, Long currentUserId){
+    public List<UserSearchDTO> searchUsers(String username, Long currentUserId) {
+        // 1. Jbed ga3 l-users li kiy-matchiw s-smiya
         List<User> users = userRepository.findByUsernameContainingIgnoreCaseAndIdNot(username, currentUserId);
-         return users.stream().map(user -> {
-        UserSearchDTO dto = new UserSearchDTO();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
         
-        boolean following = followRepository
-            .existsByFollowerIdAndFollowingId(currentUserId, user.getId());
-        
-        dto.setFollowing(following);
+        // 2. Jbed ga3 l-IDs li m-followihom l-user mra wa7da (1 Query)
+        // Ila kān currentUserId null (machi m-login), rjje3 list khawya
+        List<Long> followingIds = (currentUserId != null) 
+                ? followRepository.findFollowingIdsByFollowerId(currentUserId) 
+                : List.of();
 
-        return dto;
-        }).toList();
+        // 3. Map to DTO
+        return users.stream().map(user -> {
+            UserSearchDTO dto = new UserSearchDTO();
+            dto.setId(user.getId());
+            dto.setUsername(user.getUsername());
+            
+            // Check ghir f l-memory (List.contains kadd-khdem f O(n))
+            dto.setFollowing(followingIds.contains(user.getId()));
+            
+            return dto;
+        }).collect(Collectors.toList());
     }
         public UserProfileDTO getUserProfile(String username, Long currentUserId) {
         // 1. Jbed l-user men l-DB b s-smiya
-        User targetUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User targetUser = userRepository.findByUsername(username.toLowerCase())
+                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND)); // 👈 Khdem b had l-class
+                User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
+        if (targetUser.isBanned()) {
+             throw new ApiException("User not found", HttpStatus.NOT_FOUND);
+        }
 
         UserProfileDTO dto = new UserProfileDTO();
         dto.setUsername(targetUser.getUsername());
             dto.setId(targetUser.getId());
         // 2. Check: Wach hada houwa ana?
         // Ila kante l-ID dyali kat-tswa l-ID dial s-siyyd li f l-URL
-        dto.setOwner(targetUser.getId().equals(currentUserId));
+        dto.setOwner(currentUserId != null && targetUser.getId().equals(currentUserId));
 
         // 3. Check: Wach m-followih? (Ghir ila kante machi owner)
         if (!dto.isOwner()) {
@@ -75,7 +88,7 @@ public class UserService {
 
         dto.setPosts(
             posts.stream()
-                .map((Post post) -> postService.mapToDTO(post, targetUser.getUsername()))
+                .map((Post post) -> postService.mapToDTO(post, currentUser.getUsername()))
                 .collect(Collectors.toList())
         );
 
