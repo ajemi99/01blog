@@ -9,25 +9,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ajemi.backend.dto.AuthResponseDTO;
 import com.ajemi.backend.dto.LoginRequestDTO;
 import com.ajemi.backend.dto.RegisterRequestDTO;
-import com.ajemi.backend.repository.FollowRepository;
 import com.ajemi.backend.service.AuthService;
-import com.ajemi.backend.service.UserService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-    private final UserService userService;
-    private final FollowRepository followRepository;
 
-    public AuthController(AuthService authService,UserService userService,FollowRepository followRepository) {
-        this.authService = authService;
-        this.userService = userService;
-        this.followRepository = followRepository;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO body) {
@@ -40,6 +33,5 @@ public class AuthController {
         String token = authService.login(body.identifier(), body.password());
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
-
 
 }

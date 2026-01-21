@@ -95,7 +95,7 @@
                   <small class="fw-bold text-dark">{{ comment.username }}</small>
                   <small class="text-muted ms-2" style="font-size: 0.65rem;">{{ comment.createdAt | date:'short' }}</small>
                 </div>
-                @if (comment.username === authenticatedUser?.username ) {
+                @if (comment.username === authenticatedUser?.username || post.authorUsername === authenticatedUser?.username) {
                   <button class="btn btn-link text-danger p-0 border-0 shadow-none" (click)="onDeleteComment(comment.id)">
                     <i class="bi bi-trash3 small"></i>
                   </button>

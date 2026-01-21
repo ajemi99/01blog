@@ -67,10 +67,10 @@ export class PostCard {
       this.likeService.toggleLike(post.id).subscribe({
         next: (res: any) => {
           // res jay fih { "message": "liked" }
-          if (res.message === 'liked') {
+          if (res.status === 'liked') {
             post.liked = true;
             post.likesCount++;
-          } else if (res.message === 'unliked') {
+          } else if (res.status === 'unliked') {
             post.liked = false;
             post.likesCount--;
           }
@@ -103,7 +103,7 @@ export class PostCard {
     currentPost.isLoadingComments = true;
     this.commentService.getCommentsByPost(currentPost.id).subscribe({
       next: (res) => {
-        console.log(res);
+        console.log("===============",res);
         
         currentPost.comments = res;
         currentPost.isLoadingComments = false;

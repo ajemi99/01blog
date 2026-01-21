@@ -23,7 +23,7 @@ export class CommentService {
   constructor(private http: HttpClient) {}
 
   addComment(request: CommentRequest): Observable<CommentResponse> {
-    return this.http.post<CommentResponse>(`${this.apiUrl}/add`, request);
+    return this.http.post<CommentResponse>(this.apiUrl, request);
   }
 
   getCommentsByPost(postId: number): Observable<CommentResponse[]> {

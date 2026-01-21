@@ -42,14 +42,12 @@ public class AuthService {
         if (userRepository.existsByUsername(username)){
             throw new ApiException("Username already taken", HttpStatus.BAD_REQUEST);
         }
-
+        Role userRole = roleRepository.findByName(Role.RoleName.USER)
+                .orElseThrow(() -> new ApiException("Default Role USER not found in database", HttpStatus.INTERNAL_SERVER_ERROR));
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(rawPassword));
-
-        Role userRole = roleRepository.findByName(Role.RoleName.USER)
-                .orElseThrow(() -> new RuntimeException("Role USER non trouvé"));
         user.setRole(userRole); // set role USER par défaut
 
         userRepository.save(user);
@@ -65,8 +63,8 @@ public class AuthService {
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
            throw new ApiException("Identifiants incorrects", HttpStatus.UNAUTHORIZED);
         }
-        if(user.isBanned()){
-            throw new ApiException("Votre compte est banni", HttpStatus.FORBIDDEN);
+       if (user.isBanned()) {
+            throw new ApiException("Votre compte est banni par l'administrateur", HttpStatus.FORBIDDEN);
         }
 
         return jwtService.generateTokenWithDetails(user.getUsername(), user.getRole(),user.getId());

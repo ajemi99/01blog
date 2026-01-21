@@ -2,6 +2,7 @@ package com.ajemi.backend.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +10,7 @@ import com.ajemi.backend.dto.AdminReportResponseDTO;
 import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.Report;
 import com.ajemi.backend.entity.User;
+import com.ajemi.backend.exception.ApiException;
 import com.ajemi.backend.repository.PostRepository;
 import com.ajemi.backend.repository.ReportRepository;
 import com.ajemi.backend.repository.UserRepository;
@@ -25,14 +27,15 @@ public class ReportService {
      public void reportPost(String reporterUsername, @NonNull Long postId, String reason) {
 
         User reporter = userRepository.findByUsername(reporterUsername)
-                .orElseThrow(() -> new RuntimeException("Reporter not found"));
-
+                .orElseThrow(() -> new ApiException("Reporter not found", HttpStatus.NOT_FOUND));
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Reported user not found"));
-
+               .orElseThrow(() -> new ApiException("Post not found", HttpStatus.NOT_FOUND));
+        if (reporter.isBanned()) {
+            throw new ApiException("Your account is suspended. You cannot report posts.", HttpStatus.FORBIDDEN);
+        }
         // 🛑 ما يمكنش report راسك
         if (reporter.getId().equals(post.getAuthor().getId())) {
-                throw new RuntimeException("You cannot report yourself");
+                throw new ApiException("You cannot report your own post.", HttpStatus.BAD_REQUEST);
         }
 
         Report report = new Report();
@@ -44,6 +47,7 @@ public class ReportService {
 
         reportRepository.save(report);
     }
+    
    public List<AdminReportResponseDTO> getAllReports() {
         
     return reportRepository.findAllByOrderByCreatedAtDesc()

@@ -55,9 +55,8 @@ public class PostService {
         // 4️⃣ Save Post in DB
         Post saved = postRepository.save(post);
         List<User> followers = followRepository.findFollowersByUser(actor);
-         for (User follower : followers) {
-             notificationService.createNotification(follower, actor, NotificationType.POST);
-        }
+
+        notificationService.sendNotificationsToFollowers(followers, actor, NotificationType.POST);
 
         // 5️⃣ Map Entity → DTO
         return mapToDTO(saved,username);
@@ -149,9 +148,9 @@ public PostResponseDTO updatePost(@NonNull Long id, String username,  String new
 }
 
 @Transactional(readOnly = true)
-public List<PostResponseDTO> getFeed(Authentication authentication) {
+public List<PostResponseDTO> getFeed(String username) {
     // 1. Jbed smiya dial l-user li m-login
-    String username = authentication.getName();
+   
 
     // 2. Jbed l-user mn DB (bach n-t-akkdo rah mzyan)
     User user = userRepository.findByUsername(username)

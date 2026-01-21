@@ -23,13 +23,20 @@ import lombok.RequiredArgsConstructor;
  @RestController
  @RequestMapping("/api/admin")
  @RequiredArgsConstructor
+ @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
+
     private final AdminService adminService;
     private final ReportService reportService;
+
     @GetMapping("/reports")
-    @PreAuthorize("hasRole('ADMIN')")
-    public List<AdminReportResponseDTO>getAllReports() {
-        return reportService.getAllReports();
+    public ResponseEntity<List<AdminReportResponseDTO>>getAllReports() {
+       return ResponseEntity.ok(reportService.getAllReports());
+    }
+        @PostMapping("/reports/{id}/action")
+    public ResponseEntity<Void> takeActionOnReport(@PathVariable Long id, @RequestParam String action) {
+        adminService.handleReport(id, action);
+        return ResponseEntity.ok().build();
     }
     // ---------------- Users ----------------
     @GetMapping("/users")
@@ -42,23 +49,6 @@ public class AdminController {
         adminService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-    //---------------------posts----------------------------
-        @GetMapping("/posts")
-    public ResponseEntity<List<PostDTO>> getAllPosts() {
-        return ResponseEntity.ok(adminService.getAllPosts());
-    }
-    @DeleteMapping("/posts/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
-        adminService.deletePost(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/reports/{id}/action")
-    public ResponseEntity<Void> takeActionOnReport(@PathVariable Long id, @RequestParam String action) {
-        adminService.handleReport(id, action);
-        return ResponseEntity.ok().build();
-    }
-    //---------------------ban/unban---------------------------------------------------------------------
     @PostMapping("/users/{id}/ban")
     public ResponseEntity<Void> banUser(@PathVariable Long id) {
         adminService.banUser(id);
@@ -68,5 +58,16 @@ public class AdminController {
     public ResponseEntity<Void> unbanUser(@PathVariable Long id) {
          adminService.unbanUser(id);
         return ResponseEntity.ok().build();
+    }
+
+    //---------------------posts----------------------------
+        @GetMapping("/posts")
+    public ResponseEntity<List<PostDTO>> getAllPosts() {
+        return ResponseEntity.ok(adminService.getAllPosts());
+    }
+    @DeleteMapping("/posts/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+        adminService.deletePost(id);
+        return ResponseEntity.noContent().build();
     }
 }

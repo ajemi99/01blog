@@ -16,21 +16,21 @@ import com.ajemi.backend.dto.UserSearchDTO;
 import com.ajemi.backend.security.UserDetailsImpl;
 import com.ajemi.backend.service.UserService;
 
+import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/api/users")
-
+@RequiredArgsConstructor
 public class UserController{
 
     private final UserService userService;
 
-    public UserController(UserService userService){
-        this.userService = userService;
 
-    }
     @GetMapping("/search")
-    public List<UserSearchDTO> search( @RequestParam String query,@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return userService.searchUsers(query,userDetails.getId());
+    public ResponseEntity<List<UserSearchDTO>> search( @RequestParam String query,@AuthenticationPrincipal UserDetailsImpl userDetails){
+        List<UserSearchDTO> results = userService.searchUsers(query, userDetails.getId());
+        return ResponseEntity.ok(results);
     }
         @GetMapping("/profile/{username}")
     public ResponseEntity<UserProfileDTO> getProfile(

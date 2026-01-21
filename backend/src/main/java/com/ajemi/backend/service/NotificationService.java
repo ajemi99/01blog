@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationService {
   private final NotificationRepository notificationRepository;  
+    @Async
+    public void sendNotificationsToFollowers(List<User> followers, User actor, NotificationType type) {
+        for (User follower : followers) {
+            this.createNotification(follower, actor, type);
+        }
+    }
   public void createNotification(
             User receiver,   // لي غادي توصّلو
             User actor,      // لي دار الفعل
@@ -87,14 +94,8 @@ public Page<NotificationResponseDTO> getUserNotifications(User user, int page, i
         return notificationRepository.countByUserIdAndReadFalse(receiverId);
     }
     @Transactional
-        public void markAllAsRead(User user) {
-            // 1. Jbed ga3 li ma-m9riyinch
-            List<Notification> unreadNotifications = notificationRepository.findByUserAndReadFalse(user);
-            
-            // 2. Raddhom kamlin true
-            unreadNotifications.forEach(n -> n.setRead(true));
-            
-            // 3. Save
-            notificationRepository.saveAll(unreadNotifications);
-        }
+    public void markAllAsRead(User user) {
+        // 🚀 Query wa7da f d-Database blast loop f l-Java
+        notificationRepository.markAllAsReadForUser(user.getId());
+    }
 }

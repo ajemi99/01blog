@@ -2,6 +2,7 @@ package com.ajemi.backend.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +12,7 @@ import com.ajemi.backend.entity.Post;
 import com.ajemi.backend.entity.Report;
 import com.ajemi.backend.entity.Role;
 import com.ajemi.backend.entity.User;
+import com.ajemi.backend.exception.ApiException;
 import com.ajemi.backend.repository.FollowRepository;
 import com.ajemi.backend.repository.NotificationRepository;
 import com.ajemi.backend.repository.PostRepository;
@@ -38,8 +40,11 @@ public class AdminService {
  @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+               .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
+        // 🚩 Check 1: Ma-tmsa7ch Admin khr!
+        if (user.getRole().getName().equals(Role.RoleName.ADMIN)) {
+            throw new ApiException("Moussta7il t-msa7 Admin!", HttpStatus.FORBIDDEN);
+        }
         // 1️⃣ Delete notifications where user is actor or owner
         notificationRepository.deleteAllByActor(user);
         notificationRepository.deleteAllByUser(user);
@@ -61,7 +66,7 @@ public class AdminService {
         for(Post post:posts){
             fileStorageService.deleteFile(post.getMediaUrl());
         }
-        postRepository.deleteAll(posts);
+        // postRepository.deleteAll(posts);
 
         // 7️⃣ Finally, delete user
         userRepository.delete(user);
@@ -89,12 +94,10 @@ public class AdminService {
    @Transactional
 public void handleReport(Long reportId, String action) {
     Report report = reportRepository.findById(reportId) 
-            .orElseThrow(() -> new RuntimeException("Report not found"));
+           .orElseThrow(() -> new ApiException("Report not found", HttpStatus.NOT_FOUND));
 
     User reportedUser = report.getReportedUser();
-    if (reportedUser == null) {
-        throw new RuntimeException("Reported user not found");
-    }
+
 
     // 🚩 Logic d-protection: Ila l-reported user Admin, ma-ndiro walou f l-Ban/Delete
     boolean isTargetAdmin = reportedUser.getRole().getName().equals(Role.RoleName.ADMIN);
@@ -107,17 +110,17 @@ public void handleReport(Long reportId, String action) {
         }
         case "ban_user" -> {
             if (isTargetAdmin) {
-                throw new RuntimeException("Moussta7il t-banni Admin!");
+               throw new ApiException("Moussta7il t-banni Admin!", HttpStatus.FORBIDDEN);
             }
             reportedUser.setBanned(true);
         }
         case "delete_user" -> {
             if (isTargetAdmin) {
-                throw new RuntimeException("Moussta7il t-msa7 Admin!");
+               if (isTargetAdmin) throw new ApiException("Moussta7il t-msa7 Admin!", HttpStatus.FORBIDDEN);
             }
             deleteUser(reportedUser.getId());
         }
-        default -> throw new RuntimeException("Unknown action");
+        default -> throw new ApiException("Unknown action", HttpStatus.BAD_REQUEST);
     }
 
     reportRepository.delete(report); 
