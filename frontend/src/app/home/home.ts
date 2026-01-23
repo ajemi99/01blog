@@ -1,11 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { CreatePostComponent } from '../components/create-post/create-post';
-import { PostService } from '../services/post.service';
+import { PostPageResponse, PostResponseDTO, PostService } from '../services/post.service';
 import { PostCard } from '../components/post-card/post-card';
-import { UserService } from '../services/userService';
+import { currentUser, UserService } from '../services/userService';
 
 
 @Component({
@@ -15,28 +15,53 @@ import { UserService } from '../services/userService';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit {
-
-      posts: any[] = [];
+export class Home implements OnInit, AfterViewInit {
+  @ViewChild('scrollAnchor') scrollAnchor!: ElementRef;
+      posts:PostResponseDTO[] = [];
+      currentPage = 0;
+      isLastPage = false;
       private postService = inject(PostService)
       private  userService = inject(UserService)
-      currentUser: any;
+      private observer!: IntersectionObserver;
+      currentUser!: currentUser;
       constructor() {}
       
       ngOnInit(): void {
-    this.userService  .currentUser$.subscribe(user => {
+       this.userService.currentUser$.subscribe(user => {
       this.currentUser = user;
       console.log(this.currentUser);
       
     });
     this.loadFeed();
   }
+  ngAfterViewInit() {
+    this.setupIntersectionObserver();
+  }
+  setupIntersectionObserver() {
+    this.observer = new IntersectionObserver((entries) => {
+      // Ila l-user hbaṭ w ban l-Anchor + machi l-page l-lakhera
+      if (entries[0].isIntersecting && !this.isLastPage && this.posts.length > 0) {
+        console.log('Fetching more posts... 🚀');
+        this.loadFeed();
+      }
+    }, { threshold: 0.1 }); // 10% mn l-element i-bān ghadi i-déclencha
 
+    this.observer.observe(this.scrollAnchor.nativeElement);
+  }
     loadFeed() {
-      this.postService.getFeed().subscribe({
-        next: (data) => {
-          this.posts = data;
-          console.log('Feed loaded ✅', this.posts);
+      if (this.isLastPage) return;
+      this.postService.getFeed(this.currentPage,10).subscribe({
+        next: (data:PostPageResponse) => {
+          const newPosts = data.content;
+          // 🚩 2. Filter: Khli ghir l-posts li l-ID dyalhom machi aslan 3ndna f this.posts
+            const uniqueNewPosts = newPosts.filter(newPost => 
+              !this.posts.some(existingPost => existingPost.id === newPost.id)
+            );
+          this.posts = [...this.posts, ...uniqueNewPosts];
+          // this.isLastPage = data.last;
+          this.isLastPage = (data.page.number + 1) >= data.page.totalPages;
+          this.currentPage++;
+          console.log('Feed loaded ✅', data);
         },
         error: (err) => console.error('Error loading feed ❌', err)
       });
@@ -54,7 +79,12 @@ export class Home implements OnInit {
         this.posts.unshift(post);
       }
     }
-
+// 🚩 Darouri n-wqfou l-observer mlli n-kharjou mn l-component
+    ngOnDestroy() {
+      if (this.observer) {
+        this.observer.disconnect();
+      }
+    }
     onCommentsOpened(openedPostId: number) {
       // Dour 3la ga3 l-posts li 3ndek f l-list
       this.posts.forEach(p => {

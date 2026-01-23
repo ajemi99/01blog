@@ -1,6 +1,15 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+
+export interface currentUser{
+  id:number;
+  username : string;
+  email:string;
+  followers:number;
+  following:number;
+  role:string;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -22,8 +31,8 @@ export class UserService{
     return this.http.post(`${this.apiUrl}/reports/${postId}`, { reason });
   }
     // 3. Had l-function t-3eyet liha ghir mra wa7da f app.component
-  loadCurrentUser(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/users/me`).pipe(
+  loadCurrentUser(): Observable<currentUser> {
+    return this.http.get<currentUser>(`${this.apiUrl}/users/me`).pipe(
       tap(user => {
         this.userSubject.next(user); // Khzen l-user f l-khzana
       })

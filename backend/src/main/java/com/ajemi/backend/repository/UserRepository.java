@@ -10,13 +10,13 @@ import com.ajemi.backend.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByEmail(String email);
-    Optional<User> findByUsernameOrEmail(String username, String email);
-    Optional<User> findByUsername(String username);
+     Optional<User> findByEmail(String email);
+    Optional<User> findByUsernameOrEmail(String username, String email);//3
+     Optional<User> findByUsername(String username);
 
-    boolean existsByEmail(String email);
+    boolean existsByEmail(String email);//1
 
-    boolean existsByUsername(String username);
-   List<User> findAllByRole_Name(Role.RoleName name);
-    List<User> findByUsernameContainingIgnoreCaseAndIdNot(String username,Long id);
+    boolean existsByUsername(String username);//2
+     List<User> findAllByRole_Name(Role.RoleName name);
+     List<User> findByUsernameContainingIgnoreCaseAndIdNot(String username,Long id);
 }

@@ -2,9 +2,11 @@ package com.ajemi.backend.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -148,7 +150,7 @@ public PostResponseDTO updatePost(@NonNull Long id, String username,  String new
 }
 
 @Transactional(readOnly = true)
-public List<PostResponseDTO> getFeed(String username) {
+public Page<PostResponseDTO> getFeed(String username,int page, int size) {
     // 1. Jbed smiya dial l-user li m-login
    
 
@@ -163,12 +165,18 @@ public List<PostResponseDTO> getFeed(String username) {
     followingIds.add(user.getId());
 
     // 5. Jbed l-posts kāmline dial l-feed m-rattbin mn l-jdid l-qdim
-    List<Post> posts = postRepository.findAllByAuthor_IdInOrderByCreatedAtDesc(followingIds);
+   // 3. Cree l-objet Pageable (ordering kiy-tra dakhil l-query a7san)
+   int safeSize = (size > 50) ? 50 : size;
+    
+    // Check raqm l-page bach may-sift-ch raqm naqes (-1)
+    int safePage = (page < 0) ? 0 : page;
+    Pageable pageable = PageRequest.of(safePage, safeSize);
 
-    // 6. Map l DTO (mapToDTO dabba kadd-dir l-check dial liked rāsha)
-    return posts.stream()
-            .map(post -> mapToDTO(post, username))
-            .toList();
+    // 4. Jbed l-page dial l-posts
+    Page<Post> postsPage = postRepository.findAllByAuthor_IdInOrderByCreatedAtDesc(followingIds, pageable);
+
+    // 5. Converti l-Page dyal Entities l Page dyal DTOs (mapToDTO)
+    return postsPage.map(post -> mapToDTO(post, username));
 }
 
 }

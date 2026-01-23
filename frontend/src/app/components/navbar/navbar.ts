@@ -1,13 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { UserService } from '../../services/userService';
+import { currentUser, UserService } from '../../services/userService';
 import { debounceTime, distinctUntilChanged, Observable, Subject, switchMap } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth/auth.service';
 import { FollowService } from '../../services/followService';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../services/notificationService';
+import { NotificationDTO, NotificationService } from '../../services/notificationService';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 @Component({
   selector: 'app-navbar',
@@ -25,7 +25,7 @@ export class Navbar implements OnInit {
   private followService = inject(FollowService)
   private searchSubject = new Subject<string>();
   private notificationService = inject(NotificationService)
-  currentUser: any;
+  currentUser!: currentUser;
   constructor(private router: Router,private authService: AuthService, private http:HttpClient) {
     this.userService.currentUser$.subscribe(user => {
     this.currentUser = user;
@@ -96,10 +96,10 @@ export class Navbar implements OnInit {
     this.showDropdown = false;   // Sedd l-menu dial l-ba7t
   }
   // Variables l-asasiya
-page = 0;
-notifications: any[] = [];
-isLoading = false;
-hasMore = true;
+  page = 0;
+  notifications: NotificationDTO[] = [];
+  isLoading = false;
+  isLastPage = false;
 
 // Mlli ycliqui 3la l-bell, loadi l-page 0
 onBellClick() {
@@ -109,12 +109,12 @@ onBellClick() {
 }
 
 loadMoreNotifications() {
-  if (this.isLoading || !this.hasMore) return;
+  if (this.isLoading || this.isLastPage) return;
 
   this.isLoading = true;
   this.notificationService.getNotifications(this.page).subscribe(res => {
     this.notifications = [...this.notifications, ...res.content];
-    // this.hasMore = !res.last;
+     this.isLastPage = res.page.number >= res.page.totalPages;
     this.page++;
     this.isLoading = false;
   });

@@ -18,11 +18,15 @@ export class Login implements OnInit {
 
 
   constructor() {}
-ngOnInit() {
-  // 🚩 N-choufou wach kayn chi error f l-URL
+  ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      if (params['error'] === 'banned') {
-        this.errorMessage = "Votre compte a été banni. Veuillez contacter l'administration.";
+      const reason = params['reason'];
+      if (reason === 'deleted') {
+        this.errorMessage = "Hada l-account ma-bqach mawjoud (T-msa7).";
+      } else if (reason === 'banned') {
+        this.errorMessage = "Had l-account t-banna mn l-Admin.";
+      } else if (reason === 'expired') {
+        this.errorMessage = "Session dyalk salat, 3awed d-dir login.";
       }
     });
 } 
@@ -44,6 +48,7 @@ ngOnInit() {
             this.errorMessage = "Identifiants incorrects. Veuillez réessayer.";
           } else if (err.status === 403) {
             // Hadi dial l-banni (l-message ghadi i-ji mn l-Back: "Votre compte est banni")
+            
             this.errorMessage = err.error?.message || "Accès refusé.";
           } else {
             this.errorMessage = "Une erreur technique est survenue.";

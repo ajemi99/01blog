@@ -65,6 +65,9 @@
                       <button class="btn btn-sm btn-outline-dark" (click)="handleAction(report.id, 'ban_user')">
                         <i class="bi bi-slash-circle"></i> Ban
                       </button>
+                      <button class="btn btn-sm btn-outline-dark" (click)="handleAction(report.id, 'delete_user')">
+                         <i class="bi bi-slash-circle"></i> Delete User
+                      </button>
                     } @else {
                       <span class="badge bg-secondary ms-2 align-self-center">Admin Protected</span>
                     }
@@ -173,7 +176,13 @@
 
                     <td class="text-secondary" style="max-width: 300px;">
                         <span [title]="post.description">
-                        {{ post.description.length > 50 ? (post.description | slice:0:50) + '...' : post.description }}
+                        @if (post.description) {
+                          {{ post.description.length > 50 
+                            ? (post.description | slice:0:50) + '...' 
+                            : post.description }}
+                        } @else {
+                          <span class="text-muted fst-italic">No description</span>
+                        }
                         </span>
                     </td>
 

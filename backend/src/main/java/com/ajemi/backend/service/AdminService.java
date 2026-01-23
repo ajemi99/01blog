@@ -13,7 +13,9 @@ import com.ajemi.backend.entity.Report;
 import com.ajemi.backend.entity.Role;
 import com.ajemi.backend.entity.User;
 import com.ajemi.backend.exception.ApiException;
+import com.ajemi.backend.repository.CommentRepository;
 import com.ajemi.backend.repository.FollowRepository;
+import com.ajemi.backend.repository.LikeRepository;
 import com.ajemi.backend.repository.NotificationRepository;
 import com.ajemi.backend.repository.PostRepository;
 import com.ajemi.backend.repository.ReportRepository;
@@ -29,6 +31,8 @@ public class AdminService {
     private final FollowRepository  subscriptionRepository;
     private final NotificationRepository notificationRepository;
     private final FileStorageService fileStorageService;
+    private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
 
     // ---------------- USERS ----------------------------------------------------------------------
         public List<UserDTO> getAllUsers() {
@@ -38,39 +42,50 @@ public class AdminService {
                 .toList();
         }
  @Transactional
-    public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-               .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
-        // 🚩 Check 1: Ma-tmsa7ch Admin khr!
-        if (user.getRole().getName().equals(Role.RoleName.ADMIN)) {
-            throw new ApiException("Moussta7il t-msa7 Admin!", HttpStatus.FORBIDDEN);
-        }
-        // 1️⃣ Delete notifications where user is actor or owner
-        notificationRepository.deleteAllByActor(user);
-        notificationRepository.deleteAllByUser(user);
+public void deleteUser(Long userId) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
 
-        // 2️⃣ Delete likes made by user
-        // likeRepository.deleteAllByUser(user);
+    // 🚩 Security Check
+    if (user.getRole().getName().equals(Role.RoleName.ADMIN)) {
+        throw new ApiException("Moussta7il t-msa7 Admin!", HttpStatus.FORBIDDEN);
+    }
 
-        // // 3️⃣ Delete comments made by user
-        // commentRepository.deleteAllByUser(user);
+    // 1️⃣ Delete notifications (Actor & Receiver)
+    notificationRepository.deleteAllByActor(user);
+    notificationRepository.deleteAllByUser(user);
+    notificationRepository.flush(); // 🔥 Force delete daba
 
-        // 4️⃣ Delete subscriptions (follower or followed)
-        subscriptionRepository.deleteAllByFollowerOrFollowing(user, user);
+    // 2️⃣ Delete likes & comments dyal had l-user
+    likeRepository.deleteAllByUser(user);
+    commentRepository.deleteAllByUser(user);
+    likeRepository.flush();
+    commentRepository.flush();
 
-        // 5️⃣ Delete reports where user is reporter or reported
-        reportRepository.deleteAllByReporterOrReportedUser(user, user);
+    // 3️⃣ Delete subscriptions (Followers/Following)
+    subscriptionRepository.deleteAllByFollowerOrFollowing(user, user);
+    subscriptionRepository.flush();
 
-        // 6️⃣ Delete posts (cascade will remove comments and likes)
-        List<Post> posts = postRepository.findAllByAuthor(user);
-        for(Post post:posts){
+    // 4️⃣ Delete reports dyal had l-user
+    reportRepository.deleteAllByReporterOrReportedUser(user, user);
+    reportRepository.flush();
+
+    // 5️⃣ Delete posts w d-data dyalhom
+    List<Post> posts = postRepository.findAllByAuthor(user);
+    for (Post post : posts) {
+        // Msa7 l-file mn l-disk
+        if (post.getMediaUrl() != null) {
             fileStorageService.deleteFile(post.getMediaUrl());
         }
-        // postRepository.deleteAll(posts);
-
-        // 7️⃣ Finally, delete user
-        userRepository.delete(user);
+        // 🚩 Darouri msa7 l-reports dial had l-post qbel ma t-msa7 l-post
+        reportRepository.deleteByPostId(post.getId());
+        postRepository.delete(post);
     }
+    postRepository.flush(); // 🔥 Force delete posts
+
+    // 6️⃣ Finally, delete l-user
+    userRepository.delete(user);
+}
 // ---------------- POSTS ---------------------------------------------------------------------------
         public List<PostDTO> getAllPosts() {
         return postRepository.findAllByOrderByCreatedAtDesc()

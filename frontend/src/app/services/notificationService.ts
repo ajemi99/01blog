@@ -8,8 +8,14 @@ export interface NotificationDTO {
   read: boolean;
   createdAt: string;
 }
-export interface notifications {
+export interface notificationsPageResponse {
     content:NotificationDTO[];
+    page: {
+        size: number;
+        number: number;      // Page l-7aliya
+        totalElements: number;
+        totalPages: number;   // Total dial l-pages
+      };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -23,9 +29,9 @@ export class NotificationService {
   constructor(private http: HttpClient) {}
 
   // 1. Get ga3 notifications
-getNotifications(page: number): Observable<notifications> {
+getNotifications(page: number): Observable<notificationsPageResponse> {
   // Sift page query param l-Backend
-  return this.http.get<notifications>(`${this.apiUrl}?page=${page}&size=10`);
+  return this.http.get<notificationsPageResponse>(`${this.apiUrl}?page=${page}&size=10`);
 }
 
   // 2. Get unread count

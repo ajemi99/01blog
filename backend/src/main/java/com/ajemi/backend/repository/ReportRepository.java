@@ -19,3 +19,4 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findAllByOrderByCreatedAtDesc();
 
 }
+
