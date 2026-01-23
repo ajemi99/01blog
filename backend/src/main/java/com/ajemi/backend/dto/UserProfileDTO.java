@@ -1,6 +1,6 @@
 package com.ajemi.backend.dto;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 import lombok.Data;
 
@@ -14,8 +14,8 @@ public class UserProfileDTO {
     private long followingCount;
     
     // Had l-joj homa l-Logic kamel:
-    private boolean isOwner;      // True ila knti nta moula l-profile
-    private boolean isFollowing;  // True ila knti m-followi had s-siyyd
+    private boolean owner;      // True ila knti nta moula l-profile
+    private boolean following;  // True ila knti m-followi had s-siyyd
     
-    private List<PostResponseDTO> posts;
+    private Page<PostResponseDTO> posts;
 }

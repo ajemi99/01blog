@@ -35,9 +35,11 @@ public class UserController{
         @GetMapping("/profile/{username}")
     public ResponseEntity<UserProfileDTO> getProfile(
             @PathVariable String username,
-            @AuthenticationPrincipal UserDetailsImpl userDetails // Jbed l-ID dyali men l-Token
+            @AuthenticationPrincipal UserDetailsImpl userDetails, // Jbed l-ID dyali men l-Token
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok(userService.getUserProfile(username, userDetails.getId()));
+        return ResponseEntity.ok(userService.getUserProfile(username, userDetails.getId(),page,size));
     }
        @GetMapping("/me")
     public ResponseEntity<InfoDto> getCurrentUser( @AuthenticationPrincipal UserDetailsImpl userDetails) {

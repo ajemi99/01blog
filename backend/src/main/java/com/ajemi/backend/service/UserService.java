@@ -3,10 +3,14 @@ package com.ajemi.backend.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.ajemi.backend.dto.InfoDto;
+import com.ajemi.backend.dto.PostResponseDTO;
 import com.ajemi.backend.dto.UserProfileDTO;
 import com.ajemi.backend.dto.UserSearchDTO;
 import com.ajemi.backend.entity.Post;
@@ -54,7 +58,7 @@ public class UserService {
             return dto;
         }).collect(Collectors.toList());
     }
-        public UserProfileDTO getUserProfile(String username, Long currentUserId) {
+        public UserProfileDTO getUserProfile(String username, Long currentUserId, int page, int size) {
         // 1. Jbed l-user men l-DB b s-smiya
         User targetUser = userRepository.findByUsername(username.toLowerCase())
                 .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND)); // 👈 Khdem b had l-class
@@ -63,6 +67,7 @@ public class UserService {
         if (targetUser.isBanned()) {
              throw new ApiException("User not found", HttpStatus.NOT_FOUND);
         }
+
 
         UserProfileDTO dto = new UserProfileDTO();
         dto.setUsername(targetUser.getUsername());
@@ -81,17 +86,18 @@ public class UserService {
         dto.setPostsCount(postRepository.countByAuthor_Id(targetUser.getId()));
         dto.setFollowersCount(followRepository.countFollowers(targetUser.getId()));
         dto.setFollowingCount(followRepository.countFollowing(targetUser.getId()));
-
+           int safeSize = (size > 50) ? 50 : size;
+            int safePage = (page < 0) ? 0 : page;
+         Pageable pageable = PageRequest.of(safePage, safeSize);
         // 5. Jbed l-posts dialu
-    List<Post> posts =
-            postRepository.findByAuthor_IdOrderByCreatedAtDesc(targetUser.getId());
+         Page<Post> postsEntityPage =
+            postRepository.findByAuthor_IdOrderByCreatedAtDesc(targetUser.getId(),pageable);
 
-        dto.setPosts(
-            posts.stream()
-                .map((Post post) -> postService.mapToDTO(post, currentUser.getUsername()))
-                .collect(Collectors.toList())
+        // 6. Converti l-Page dyal Entities l Page dyal DTOs
+        Page<PostResponseDTO> postsDtoPage = postsEntityPage.map(post -> 
+            postService.mapToDTO(post, currentUser.getUsername())
         );
-
+        dto.setPosts(postsDtoPage);
 
         return dto;
     }

@@ -40,18 +40,21 @@
 
     <p class="card-text fs-6 text-dark px-1">{{ post.description }}</p>
 
-    <div class="post-media-container mt-3 mb-2 bg-light rounded-3 border overflow-hidden shadow-sm">
-      @if (isImage(post.mediaUrl)) {
-        <img [src]="'http://localhost:8080' + post.mediaUrl" 
-             class="img-fluid w-100 object-fit-contain" 
-             style="max-height: 550px;" />
-      }
-      @if (isVideo(post.mediaUrl)) {
-        <video controls class="w-100 h-100 bg-black">
-          <source [src]="'http://localhost:8080' + post.mediaUrl" type="video/mp4" />
-        </video>
-      }
-    </div>
+      <div class="post-media-container mt-3 mb-2 bg-light rounded-3 border overflow-hidden shadow-sm">
+        @if (isImage(post.mediaUrl)) {
+          <img [src]="'http://localhost:8080' + post.mediaUrl" 
+              class="img-fluid w-100 object-fit-contain" 
+              style="max-height: 550px;" 
+              alt="Post content" />
+        }
+
+        @if (isVideo(post.mediaUrl)) {
+          <video controls class="w-100 h-100 bg-black">
+            <source [src]="'http://localhost:8080' + post.mediaUrl" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        }
+      </div>
   </div>
 
   <div class="card-footer bg-white border-0 d-flex justify-content-around py-2 border-top">

@@ -16,7 +16,7 @@ import com.ajemi.backend.entity.User;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAllByOrderByCreatedAtDesc();
-    List<Post> findByAuthor_IdOrderByCreatedAtDesc(Long authorId);
+    Page<Post> findByAuthor_IdOrderByCreatedAtDesc(Long authorId, Pageable pageable);
     Page<Post> findAllByAuthor_IdInOrderByCreatedAtDesc(List<Long> authorIds, Pageable pageable);
 
     void deleteAllByAuthor(User author);

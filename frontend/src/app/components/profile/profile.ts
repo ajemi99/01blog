@@ -1,12 +1,13 @@
 // profile.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UserService } from '../../services/userService';
+import { currentUser, UserProfileDTO, UserService } from '../../services/userService';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PostCard } from '../post-card/post-card';
 import { HttpClient } from '@angular/common/http';
 import { FollowService } from '../../services/followService';
+import { PostResponseDTO } from '../../services/post.service';
 
 @Component({
   selector: 'app-profile',
@@ -14,35 +15,64 @@ import { FollowService } from '../../services/followService';
   imports: [FormsModule, CommonModule,PostCard],
   styleUrl: './profile.css'
 })
+
 export class Profile implements OnInit {
   private route = inject(ActivatedRoute);
   private userService = inject(UserService);
   private followService = inject(FollowService)
   constructor(private http: HttpClient,private router :Router){}
-  profileData: any;
+  profileData!: UserProfileDTO;
+  posts: PostResponseDTO[] = [];
   isLoading = true;
   isProcessing = false;
-
+  currentUser!:currentUser;
+  currentPage = 0;
+   isLastPage = false;
   ngOnInit() {
-    // Listen l-username f l-URL
-    this.route.paramMap.subscribe(params => {
-      const username = params.get('username');
-      if (username) {
-        this.fetchProfile(username);
-      }
+// 🚩 Had s-sâr houwa l-mohim: kiy-7ḍi ay tebdila f l-URL
+  this.route.paramMap.subscribe(params => {
+    const newUsername = params.get('username');
+    if (newUsername) {
+      this.resetAndFetch(newUsername);
+    }
+  });
+       this.userService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+      console.log(this.currentUser);
+      
     });
+    
+  }
+  resetAndFetch(username: string) {
+    // 1. Khwi d-data d l-user l-qdim
+    this.posts = [];
+    this.currentPage = 0;
+    this.isLastPage = false;
+    
+    // 2. 3iyyet l l-API b s-smiya l-jdida
+    this.fetchProfile(username); 
   }
 
   fetchProfile(username: string) {
-    this.isLoading = true;
-    this.userService.getUserProfile(username).subscribe({
-      next: (data) => {
+    if(this.isLastPage)return;
+    // 🚩 Ngoulou isLoading = true ghir ila kante l-page 0
+    if (this.currentPage === 0) this.isLoading = true;
+    this.userService.getUserProfile(username,this.currentPage,10).subscribe({
+      next: (data:UserProfileDTO) => {
         this.profileData = data;
+                  const newPosts = data.posts.content;
+          // 🚩 2. Filter: Khli ghir l-posts li l-ID dyalhom machi aslan 3ndna f this.posts
+        const uniqueNewPosts = newPosts.filter(newPost => 
+             !this.posts.some(existingPost => existingPost.id === newPost.id)
+        );
+        this.posts = [...this.posts,...uniqueNewPosts]
         console.log(this.profileData);
-        
+        this.isLastPage = (this.profileData.posts.page.number + 1) >= this.profileData.posts.page.totalPages;
+        this.currentPage++;
         this.isLoading = false;
       },
       error: (err) => {
+        this.isLoading = false;
       if (err.status === 404) {
         // 🚩 Ila user makaynach, siftou l-page 404 nichan
         console.warn('User not found, redirecting to 404...');
@@ -54,14 +84,14 @@ export class Profile implements OnInit {
 
   // Had l-function kat-khdem mlli kadd-cliqui 3la chi post akhor
   onCommentsOpened(postId: number) {
-    this.profileData.posts.forEach((p: any) => {
+    this.posts.forEach((p: any) => {
       if (p.id !== postId) p.showComments = false;
     });
   }
 
   // Mlli kadd-delete post men l-card
   onPostDeleted(postId: number) {
-    this.profileData.posts = this.profileData.posts.filter((p: any) => p.id !== postId);
+    this.posts = this.posts.filter((p: any) => p.id !== postId);
     this.profileData.postsCount--;
   }
   onFollowToggle() {

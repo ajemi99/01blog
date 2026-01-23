@@ -6,7 +6,7 @@ import { PostService } from '../../services/post.service';
 import { LikeService } from '../../services/LikeService';
 import { RouterLink } from '@angular/router';
 import { UserService } from '../../services/userService';
-import { AuthService } from '../../services/auth/auth.service';
+
 @Component({
   selector: 'app-post-card',
   imports: [CommonModule, FormsModule,RouterLink],
