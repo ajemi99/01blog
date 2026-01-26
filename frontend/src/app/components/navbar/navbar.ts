@@ -144,6 +144,9 @@ onNotifClick(notif: any) {
       error: (err) => console.error('Error marking all as read', err)
     });
   }
-
+// Had l-function ghat-rjje3 'true' ila knti f l-admin
+    shouldShowSearch(): boolean {
+      return !this.router.url.includes('/admin-panel');
+    }
 
 }

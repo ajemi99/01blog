@@ -7,40 +7,42 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navContent">
-      
-      <form class="mx-auto position-relative" style="max-width: 400px;">
-  <div class="input-group">
-    <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-    <input type="text" 
-           class="form-control bg-light border-0" 
-           placeholder="Search users..."
-           [(ngModel)]="searchTerm"
-           name="search"
-           (input)="onSearchChange()"
-           (blur)="hideDropdown()">
-  </div>
+      @if(shouldShowSearch()){
 
-  @if (showDropdown && searchResults.length > 0) {
-    <div class="search-results shadow-lg border-0 rounded-3 bg-white position-absolute w-100 mt-2 py-2">
-@for (user of searchResults; track user.id) {
-  <a [routerLink]="['/profile', user.username]" 
-  (click)="selectUser()"
-     (click)="showDropdown = false"
-     class="d-flex align-items-center justify-content-between px-3 py-2 search-item text-decoration-none">
-    
-    <div class="d-flex align-items-center">
-      <div class="avatar-sm rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 fw-bold" 
-           style="width: 32px; height: 32px; font-size: 12px;">
-        {{ user.username.charAt(0).toUpperCase() }}
-      </div>
-      <span class="fw-medium text-dark small">{{ user.username }}</span>
-    </div>
-
-  </a>
-}
-    </div>
+        <form class="mx-auto position-relative" style="max-width: 400px;">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
+            <input type="text" 
+            class="form-control bg-light border-0" 
+            placeholder="Search users..."
+            [(ngModel)]="searchTerm"
+            name="search"
+            (input)="onSearchChange()"
+            (blur)="hideDropdown()">
+          </div>
+          
+          @if (showDropdown && searchResults.length > 0) {
+            <div class="search-results shadow-lg border-0 rounded-3 bg-white position-absolute w-100 mt-2 py-2">
+              @for (user of searchResults; track user.id) {
+                <a [routerLink]="['/profile', user.username]" 
+                (click)="selectUser()"
+                (click)="showDropdown = false"
+                class="d-flex align-items-center justify-content-between px-3 py-2 search-item text-decoration-none">
+                
+                <div class="d-flex align-items-center">
+                  <div class="avatar-sm rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 fw-bold" 
+                  style="width: 32px; height: 32px; font-size: 12px;">
+                  {{ user.username.charAt(0).toUpperCase() }}
+                </div>
+                <span class="fw-medium text-dark small">{{ user.username }}</span>
+              </div>
+              
+            </a>
+          }
+        </div>
+      }
+    </form>
   }
-</form>
 
       <ul class="navbar-nav ms-auto align-items-center">
         

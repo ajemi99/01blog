@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import  org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.data.domain.Page;
 import com.ajemi.backend.dto.CommentRequestDTO;
 import com.ajemi.backend.dto.CommentResponseDTO;
 import com.ajemi.backend.security.UserDetailsImpl;
@@ -43,10 +44,12 @@ public class CommentController {
 
     // Récupérer tous les commentaires d'un post
     @GetMapping("/post/{postId}")
-    public ResponseEntity<List<CommentResponseDTO>> getCommentsByPost(
-            @PathVariable Long postId
+    public ResponseEntity<Page<CommentResponseDTO>> getCommentsByPost(
+            @PathVariable Long postId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        List<CommentResponseDTO> comments = commentService.getCommentsByPost(postId);
+        Page<CommentResponseDTO> comments = commentService.getCommentsByPost(postId,page,size);
         return ResponseEntity.ok(comments);
     }
 

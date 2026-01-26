@@ -14,6 +14,7 @@ export interface PostResponseDTO {
     likesCount:number;
     commentCount:number;
     showComments?: boolean;
+    comments:[];
 }
 export interface PostPageResponse{
   content:PostResponseDTO[];

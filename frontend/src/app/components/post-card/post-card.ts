@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CommentService } from '../../services/comment.service';
-import { PostService } from '../../services/post.service';
+import { commentPageResponse, CommentResponse, CommentService } from '../../services/comment.service';
+import { PostResponseDTO, PostService } from '../../services/post.service';
 import { LikeService } from '../../services/LikeService';
 import { RouterLink } from '@angular/router';
 import { UserService } from '../../services/userService';
@@ -18,7 +18,10 @@ export class PostCard {
   @Input() post: any;        // L-post li ghadi i-ji men l-Home aw Profile
   @Input() currentUser: any; // Bach n-عرفو isOwner dial l-comment masalan
   @Input() editComponent?: any;
-  private userService = inject(UserService)
+  private comments:CommentResponse[]=[];
+  private currentCommentPage:number=0;
+   isLastCommentPage:boolean = false;
+   userService = inject(UserService)
   constructor(private postService: PostService,
     private commentService: CommentService,
     private likeService: LikeService,
@@ -85,33 +88,51 @@ export class PostCard {
       });
     }
 
-    onToggleComments(currentPost: any) {
-  // 1. Ila l-post kan aslan m7loum, ghir n-seddoh (Toggle normal)
-  if (currentPost.showComments) {
-    currentPost.showComments = false;
-    return;
+ onToggleComments(currentPost: PostResponseDTO) {
+  
+    if (currentPost.showComments) {
+      currentPost.showComments = false;
+      return;
+    }
+
+    this.commentsOpened.emit(this.post.id);
+    currentPost.showComments = true;
+
+    // شحن الصفحة الأولى فقط إذا كانت القائمة فارغة
+    if (!currentPost.comments || currentPost.comments.length === 0) {
+      this.currentCommentPage = 0; // إعادة التصفير عند أول فتح
+      this.isLastCommentPage = false;
+      this.loadMoreComments(currentPost);
+    }
   }
+  loadMoreComments(currentPost: any) {
+    if (this.isLastCommentPage || currentPost.isLoadingComments) return;
 
-  // 2. Sedd ga3 l-comments dial ga3 l-posts khorine
-  this.commentsOpened.emit(this.post.id);
-
-  // 3. 7ell l-comments dial l-post li cliquina 3lih
-  currentPost.showComments = true;
-
-  // 4. Fetch data ila kant khawya (nafs l-logic dial qbila)
-  if (!currentPost.comments) {
     currentPost.isLoadingComments = true;
-    this.commentService.getCommentsByPost(currentPost.id).subscribe({
-      next: (res) => {
-        console.log("===============",res);
+      if (!currentPost.comments) {
+        currentPost.comments = [];
+      }
+    this.commentService.getCommentsByPost(currentPost.id, this.currentCommentPage, 10).subscribe({
+      next: (res: commentPageResponse) => {
+        const newComments = res.content;
+        const uniqueNewComments = newComments.filter(newComment => 
+              !currentPost.comments.some((existingComment:any) => existingComment.id === newComment.id)
+            );
+        // دمج التعليقات الجديدة مع القديمة
+        currentPost.comments = [...(currentPost.comments || []), ...uniqueNewComments];
         
-        currentPost.comments = res;
+        // تحديث حالة الصفحة
+        // Spring Pageable كيعطيك معلومات ف res.page (أو res مباشرة حسب الـ JSON اللي كيصيفط السيرفر)
+        // إذا كان السيرفر كيصيفط Page object كامل:
+        this.isLastCommentPage = (res.page.number + 1) >= res.page.totalPages;
+        this.currentCommentPage++;
+        
         currentPost.isLoadingComments = false;
       },
       error: () => currentPost.isLoadingComments = false
     });
   }
-}
+
 
   onAddComment() {
     if (!this.post.newCommentText || !this.post.newCommentText.trim()) return;

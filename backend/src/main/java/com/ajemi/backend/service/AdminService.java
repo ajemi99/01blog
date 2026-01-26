@@ -2,6 +2,10 @@ package com.ajemi.backend.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,14 +39,14 @@ public class AdminService {
     private final CommentRepository commentRepository;
 
     // ---------------- USERS ----------------------------------------------------------------------
-        public List<UserDTO> getAllUsers() {
-        return userRepository.findAllByRole_Name(Role.RoleName.USER)
-                .stream()
-                .map(UserDTO::new)
-                .toList();
+        public Page<UserDTO> getAllUsers(int page,int size) {
+            int validatedSize = (size > 50) ? 10 : size;
+            Pageable pageable = PageRequest.of(page, validatedSize, Sort.by("id").descending());
+        return userRepository.findAllByRole_Name(Role.RoleName.USER,pageable)
+                .map(UserDTO::new);
         }
- @Transactional
-public void deleteUser(Long userId) {
+    @Transactional
+    public void deleteUser(Long userId) {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
 
@@ -87,12 +91,12 @@ public void deleteUser(Long userId) {
     userRepository.delete(user);
 }
 // ---------------- POSTS ---------------------------------------------------------------------------
-        public List<PostDTO> getAllPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(PostDTO::new)
-                .toList();
-        }
+        public Page<PostDTO> getAllPosts(int page,int size) {
+             int validatedSize = (size > 50) ? 10 : size;
+            Pageable pageable = PageRequest.of(page, validatedSize, Sort.by("createdAt").descending());
+        return postRepository.findAll(pageable)
+                .map(PostDTO::new);
+        }   
         @Transactional
          public void deletePost(Long postId) {
             Post post = postRepository.findById(postId)

@@ -2,6 +2,7 @@ package com.ajemi.backend.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,8 @@ import com.ajemi.backend.dto.UserDTO;
 import com.ajemi.backend.service.AdminService;
 import com.ajemi.backend.service.ReportService;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
  @RestController
@@ -30,8 +33,10 @@ public class AdminController {
     private final ReportService reportService;
 
     @GetMapping("/reports")
-    public ResponseEntity<List<AdminReportResponseDTO>>getAllReports() {
-       return ResponseEntity.ok(reportService.getAllReports());
+    public ResponseEntity<Page<AdminReportResponseDTO>>getAllReports(
+        @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page cannot be negative") int page,
+        @RequestParam(defaultValue = "10") @Max(value = 50, message = "Size too large") int size) {
+       return ResponseEntity.ok(reportService.getAllReports(page,size));
     }
         @PostMapping("/reports/{id}/action")
     public ResponseEntity<Void> takeActionOnReport(@PathVariable Long id, @RequestParam String action) {
@@ -40,8 +45,10 @@ public class AdminController {
     }
     // ---------------- Users ----------------
     @GetMapping("/users")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        return ResponseEntity.ok(adminService.getAllUsers());
+    public ResponseEntity<Page<UserDTO>> getAllUsers(  
+           @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page cannot be negative") int page,
+             @RequestParam(defaultValue = "10") @Max(value = 50, message = "Size too large") int size) {
+        return ResponseEntity.ok(adminService.getAllUsers(page,size));
     }
 
      @DeleteMapping("/users/{id}")
@@ -62,8 +69,10 @@ public class AdminController {
 
     //---------------------posts----------------------------
         @GetMapping("/posts")
-    public ResponseEntity<List<PostDTO>> getAllPosts() {
-        return ResponseEntity.ok(adminService.getAllPosts());
+    public ResponseEntity<Page<PostDTO>> getAllPosts(           
+        @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page cannot be negative") int page,
+        @RequestParam(defaultValue = "10") @Max(value = 50, message = "Size too large") int size) {
+        return ResponseEntity.ok(adminService.getAllPosts(page,size));
     }
     @DeleteMapping("/posts/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {

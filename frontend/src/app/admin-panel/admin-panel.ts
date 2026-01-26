@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AdminService, PostDto, ReportResponse, UserDto } from '../services/admin.service';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+
 @Component({
   selector: 'app-admin-panel',
   imports: [RouterLink,CommonModule],
@@ -14,67 +14,29 @@ export class AdminPanel implements OnInit{
   reports : ReportResponse[] =[]
   users : UserDto[] = []
   posts: PostDto[] = [];
-  private route = inject(ActivatedRoute);
-  searchTerm: string = '';
+  reportPage = 0; reportTotalPages = 0;
+  userPage = 0; userTotalPages = 0;
+  postPage = 0; postTotalPages = 0;
+
 
   ngOnInit() {
-    this.loadAllReports();
-    this.loadUsers();
-    this.loadPosts();
-    // 📡 T-ssant l l-URL: kollma tbeddel s-search f navbar, hadchi kiy-khdem
-    this.route.queryParams.subscribe(params => {
-      this.searchTerm = params['search']?.toLowerCase() || '';
-    });
+    this.loadAllReports(0);
+    this.loadUsers(0);
+    this.loadPosts(0);
   }
-  // 🔍 Getter bach n-filteriw l-reports f l-blassa
-get filteredReports() {
-  if (!this.searchTerm) return this.reports;
-  
-  const term = this.searchTerm.toLowerCase();
-  
-  return this.reports.filter(r => {
-    // 1. Check f l-usernames w l-reason
-    const matchText = r.reason?.toLowerCase().includes(term) || 
-                      r.reportedUsername?.toLowerCase().includes(term) ||
-                      r.reporterUsername?.toLowerCase().includes(term);
 
-    // 2. Check f l-Post ID (ila kān moujoud)
-    // Kan-7wlou r.postId l-string bach n-qrawh 
-    const matchPostId = r.postId ? r.postId.toString().includes(term) : false;
-
-    return matchText || matchPostId;
-  });
-}
-  // 🔍 Getter bach n-filteriw l-users
-  get filteredUsers() {
-    if (!this.searchTerm) return this.users;
-    return this.users.filter(u => 
-      u.username?.toLowerCase().includes(this.searchTerm) || 
-      u.email?.toLowerCase().includes(this.searchTerm)
-    );
-  }
-    get filteredPosts() {
-    if (!this.searchTerm) return this.posts;
-    const term = this.searchTerm.toLowerCase();
-    
-    return this.posts.filter(p => 
-      p.author?.toLowerCase().includes(term) || 
-      p.description?.toLowerCase().includes(term) ||
-      p.id.toString().includes(term) // Search b l-Post ID nichan
-    );
-  }
   // 4. Function li kadd-jbed l-data
-  loadAllReports() {
-    this.adminService.getAllReports().subscribe({
+  loadAllReports(page:number) {
+    this.adminService.getAllReports(page,10).subscribe({
       next: (data) => {
-        this.reports = data; // Dabba l-reports wellaw 3ndna f l-Front!
-        console.log("Reports loaded:", data);
+        this.reports = data.content; // Dabba l-reports wellaw 3ndna f l-Front!
+        this.reportPage = data.page.number;
+        this.reportTotalPages = data.page.totalPages;
       },
       error: (err) => console.error("Erreur f l-fetching:", err)
     });
   }
-  // N'oublie pas d'ajouter l'import de AdminService si ce n'est pas déjà fait
-// private adminService = inject(AdminService);
+
 
     handleAction(reportId: number, action: string) {
       // 1. Demander une confirmation à l'Admin
@@ -97,11 +59,13 @@ get filteredReports() {
         });
       }
     }
-
-    loadUsers() {
-      this.adminService.getAllUsers().subscribe({
+    
+    loadUsers(page:number) {
+      this.adminService.getAllUsers(page,10).subscribe({
         next: (data) => {
-          this.users = data;
+          this.users = data.content;
+          this.userPage = data.page.number;
+         this.userTotalPages = data.page.totalPages;
           console.log("Users loaded:", data);
         },
         error: (err) => console.error("Erreur users:", err)
@@ -139,10 +103,12 @@ get filteredReports() {
           });
         }
     }
-      loadPosts() {
-    this.adminService.getAllPosts().subscribe({
+      loadPosts(page :number) {
+    this.adminService.getAllPosts(page,10).subscribe({
       next: (data) => {
-        this.posts = data;
+        this.posts = data.content;
+        this.postPage = data.page.number;
+        this.postTotalPages = data.page.totalPages;
         console.log("Posts loaded:", data);
       },
       error: (err) => console.error("Erreur posts:", err)
@@ -158,6 +124,17 @@ get filteredReports() {
         }
       });
     }
+  }
+  changeUserPage(delta: number) {
+    this.loadUsers(this.userPage + delta);
+  }
+  changePostPage(delta: number) {
+    console.log(delta);
+    
+    this.loadPosts(this.postPage + delta);
+  }
+  changeReportPage(delta: number) {
+    this.loadAllReports(this.reportPage + delta);
   }
 }
 

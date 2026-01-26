@@ -3,6 +3,8 @@ package com.ajemi.backend.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ajemi.backend.entity.Role;
@@ -17,6 +19,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);//1
 
     boolean existsByUsername(String username);//2
-     List<User> findAllByRole_Name(Role.RoleName name);
+     Page<User> findAllByRole_Name(Role.RoleName name,Pageable pageable);
      List<User> findByUsernameContainingIgnoreCaseAndIdNot(String username,Long id);
 }

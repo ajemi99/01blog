@@ -3,6 +3,9 @@ package com.ajemi.backend.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -58,12 +61,16 @@ public class CommentService {
         return mapToDTO(saved);
     }
 
-    public List<CommentResponseDTO> getCommentsByPost(Long postId) {
-        return commentRepository.findByPostIdOrderByCreatedAtDesc(postId)
-                .stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
+public Page<CommentResponseDTO> getCommentsByPost(Long postId, int page, int size) {
+    // 1. صاوب الـ Pageable (10 بـ 10 ومرتبين من الجديد للقديم)
+    Pageable pageable = PageRequest.of(page, size);
+    
+    // 2. جيب الصفحة من الـ Repository
+    Page<Comment> commentPage = commentRepository.findByPostIdOrderByCreatedAtDesc(postId, pageable);
+    
+    // 3. حول الـ Entities لـ DTOs مع الحفاظ على صفة الـ Page
+    return commentPage.map(this::mapToDTO);
+}
 
     private CommentResponseDTO mapToDTO(Comment comment) {
         CommentResponseDTO dto = new CommentResponseDTO();

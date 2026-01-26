@@ -61,7 +61,7 @@ export class Home implements OnInit, AfterViewInit {
           // this.isLastPage = data.last;
           this.isLastPage = (data.page.number + 1) >= data.page.totalPages;
           this.currentPage++;
-          console.log('Feed loaded ✅', data);
+          console.log('Feed loaded ✅', data.content);
         },
         error: (err) => console.error('Error loading feed ❌', err)
       });
